@@ -1,0 +1,115 @@
+api:
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      memory: 1Gi
+
+  ingress:
+    enabled: true
+    hostname: backend-api.acme.com
+
+jobsRunner:
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+
+webApp:
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+
+  ingress:
+    enabled: true
+    hostname: app.acme.com
+
+publicApi:
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+
+  ingress:
+    enabled: true
+    hostname: api.acme.com
+
+otelCollector:
+  redisDb: "1"
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      memory: 128Mi
+
+  serviceGrpc:
+    type: LoadBalancer
+    ports:
+      grpc: 443
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: otel.acme.com
+      service.beta.kubernetes.io/aws-load-balancer-type: "external"
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:eu-west-3:${aws_account_id}:certificate/${acm_certificate_arn}"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS13-1-2-2021-06"
+      service.beta.kubernetes.io/aws-load-balancer-alpn-policy: "HTTP2Preferred"
+
+otelSqsProcessor:
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+  sqsQueueUrl: https://sqs.eu-west-3.amazonaws.com/${aws_account_id}/${otel_sqs_queue_name}
+
+migration:
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+
+config:
+  apiUrl: https://backend-api.acme.com
+  dashboardUrl: https://app.acme.com
+  region: eu-west-3
+  sessionSecret: supersecret
+  lambdaScriptEvaluatorName: ScriptEvaluatorEks
+
+  encryptionKeyExistingSecret: provider-keys
+  encryptionKeySecretKey: encryption_key
+
+  auth:
+    google:
+      enabled: true
+      existingSecret: google-oauth
+      clientIdKey: google_client_id
+      clientSecretKey: google_client_secret
+
+externalPostgres:
+  existingSecret: pg
+  hostKey: host
+  portKey: port
+  databaseKey: dbname
+  userKey: user
+  passwordKey: password
+
+externalClickhouse:
+  url: http://clickhouse:8123
+  user: basalt
+  password: basalt
+  database: monitoring
+
+externalRedis:
+  host: redis
+
+storage:
+  bucket: basalt-files
+  privateBucket: basalt-files-private
+  otelBucket: basalt-otel-traces

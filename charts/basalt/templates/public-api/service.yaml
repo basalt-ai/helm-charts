@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "basalt.public-api.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: public-api
+  {{- if or .Values.publicApi.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.publicApi.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.publicApi.service.type }}
+  {{- if and .Values.publicApi.service.clusterIP (eq .Values.publicApi.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.publicApi.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.publicApi.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.publicApi.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.publicApi.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.publicApi.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.publicApi.service.type "LoadBalancer") (eq .Values.publicApi.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.publicApi.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.publicApi.service.type "LoadBalancer") (not (empty .Values.publicApi.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.publicApi.service.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.publicApi.service.type "LoadBalancer") (not (empty .Values.publicApi.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.publicApi.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ .Values.publicApi.service.ports.http }}
+      {{- if not (eq .Values.publicApi.service.ports.http .Values.publicApi.containerPorts.http) }}
+      targetPort: {{ .Values.publicApi.containerPorts.http }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.publicApi.service.type "NodePort") (eq .Values.publicApi.service.type "LoadBalancer")) (not (empty .Values.publicApi.service.nodePorts.http)) }}
+      nodePort: {{ .Values.publicApi.service.nodePorts.http }}
+      {{- else if eq .Values.publicApi.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.publicApi.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.publicApi.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.publicApi.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: public-api

@@ -1,0 +1,51 @@
+{{- if .Values.webApp.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ template "basalt.web-app.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: web-app
+  {{- if or .Values.webApp.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.webApp.ingress.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.webApp.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.webApp.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.webApp.ingress.hostname }}
+    - host: {{ .Values.webApp.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.webApp.ingress.extraPaths }}
+          {{- toYaml .Values.webApp.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.webApp.ingress.path }}
+            pathType: {{ .Values.webApp.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "basalt.web-app.fullname" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.webApp.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "basalt.web-app.fullname" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.webApp.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.webApp.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.webApp.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.webApp.ingress.annotations )) .Values.webApp.ingress.selfSigned)) .Values.webApp.ingress.extraTls }}
+  tls:
+    {{- if and .Values.webApp.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.webApp.ingress.annotations )) .Values.webApp.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.webApp.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.webApp.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.webApp.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.webApp.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

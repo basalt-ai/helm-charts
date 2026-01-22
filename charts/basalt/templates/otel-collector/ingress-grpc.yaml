@@ -1,0 +1,51 @@
+{{- if .Values.otelCollector.ingressGrpc.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ template "basalt.otel-collector.fullname" . }}-grpc
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+  {{- if or .Values.otelCollector.ingressGrpc.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.otelCollector.ingressGrpc.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.otelCollector.ingressGrpc.ingressClassName }}
+  ingressClassName: {{ .Values.otelCollector.ingressGrpc.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.otelCollector.ingressGrpc.hostname }}
+    - host: {{ .Values.otelCollector.ingressGrpc.hostname }}
+      http:
+        paths:
+          {{- if .Values.otelCollector.ingressGrpc.extraPaths }}
+          {{- toYaml .Values.otelCollector.ingressGrpc.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.otelCollector.ingressGrpc.path }}
+            pathType: {{ .Values.otelCollector.ingressGrpc.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-grpc" (include "basalt.otel-collector.fullname" .)) "servicePort" "grpc" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.otelCollector.ingressGrpc.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-grpc" (include "basalt.otel-collector.fullname" $)) "servicePort" "grpc" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.otelCollector.ingressGrpc.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.otelCollector.ingressGrpc.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.otelCollector.ingressGrpc.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.otelCollector.ingressGrpc.annotations )) .Values.otelCollector.ingressGrpc.selfSigned)) .Values.otelCollector.ingressGrpc.extraTls }}
+  tls:
+    {{- if and .Values.otelCollector.ingressGrpc.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.otelCollector.ingressGrpc.annotations )) .Values.otelCollector.ingressGrpc.selfSigned) }}
+    - hosts:
+        - {{ .Values.otelCollector.ingressGrpc.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.otelCollector.ingressGrpc.hostname }}
+    {{- end }}
+    {{- if .Values.otelCollector.ingressGrpc.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.otelCollector.ingressGrpc.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

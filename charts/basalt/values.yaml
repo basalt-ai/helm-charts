@@ -1,0 +1,3687 @@
+## @section Global parameters
+
+global:
+  ## Global Docker image parameters
+  ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+  ## @param global.imageRegistry Global Docker Image registry
+  ## @param global.imagePullSecrets Global Docker registry secret names as an array
+  ##
+  imageRegistry: ""
+  imagePullSecrets: []
+  ## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
+  ##
+  defaultStorageClass: ""
+  ## Security parameters
+  ## @param global.security.allowInsecureImages Allows skipping image verification
+  ##
+  security:
+    allowInsecureImages: false
+  ## Compatibility adaptations for Kubernetes platforms
+  ##
+  compatibility:
+    ## Compatibility adaptations for Openshift
+    ## @param global.compatibility.openshift.adaptSecurityContext Adapt the securityContext sections of the deployment to make them compatible with Openshift restricted-v2 SCC: remove runAsUser, runAsGroup and fsGroup and let the platform use their allowed default IDs. Possible values: auto (apply if the detected running cluster is Openshift), force (perform the adaptation always), disabled (do not perform adaptation)
+    ##
+    openshift:
+      adaptSecurityContext: auto
+    ## @param global.compatibility.omitEmptySeLinuxOptions If set to true, removes the seLinuxOptions from the securityContexts when it is set to an empty object
+    ##
+    omitEmptySeLinuxOptions: false
+
+## @section Common parameters
+
+## @param kubeVersion Override Kubernetes version reported by .Capabilities
+##
+kubeVersion: ""
+## @param apiVersions Override Kubernetes API versions reported by .Capabilities
+##
+apiVersions: []
+## @param nameOverride String to partially override common.names.name
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: ""
+## @param namespaceOverride String to fully override common.names.namespace
+##
+namespaceOverride: ""
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
+## @param clusterDomain Kubernetes cluster domain name
+##
+clusterDomain: cluster.local
+## @param extraDeploy Array of extra objects to deploy with the release
+##
+extraDeploy: []
+## Diagnostic mode
+## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+## @param diagnosticMode.command Command to override all containers in the chart release
+## @param diagnosticMode.args Args to override all containers in the chart release
+##
+diagnosticMode:
+  enabled: false
+  command:
+    - sleep
+  args:
+    - infinity
+
+## @section api Parameters
+##
+
+## api container/pod description
+##
+api:
+  ## Basalt api image
+  ## @param api.image.registry [default: REGISTRY_NAME] api image registry
+  ## @param api.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] api image repository
+  ## @skip api.image.tag api image tag (immutable tags are recommended)
+  ## @param api.image.digest api image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param api.image.pullPolicy api image pull policy
+  ## @param api.image.pullSecrets api image pull secrets
+  ## @param api.image.debug Enable api image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/api
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param api.replicaCount Number of api replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param api.containerPorts.http api HTTP container port
+  ##
+  containerPorts:
+    http: 3000
+  ## @param api.extraContainerPorts Optionally specify extra list of additional ports for api containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## Configure extra options for api containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param api.livenessProbe.enabled Enable livenessProbe on api containers
+  ## @param api.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param api.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param api.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param api.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param api.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param api.readinessProbe.enabled Enable readinessProbe on api containers
+  ## @param api.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param api.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param api.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param api.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param api.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param api.startupProbe.enabled Enable startupProbe on api containers
+  ## @param api.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param api.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param api.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param api.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param api.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param api.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param api.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param api.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## @param api.resources Set api container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param api.podSecurityContext.enabled Enable api pods' Security Context
+  ## @param api.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for api pods
+  ## @param api.podSecurityContext.sysctls Set kernel settings using the sysctl interface for api pods
+  ## @param api.podSecurityContext.supplementalGroups Set filesystem extra groups for api pods
+  ## @param api.podSecurityContext.fsGroup Set fsGroup in api pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param api.containerSecurityContext.enabled Enabled api container' Security Context
+  ## @param api.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in api container
+  ## @param api.containerSecurityContext.runAsUser Set runAsUser in api container' Security Context
+  ## @param api.containerSecurityContext.runAsGroup Set runAsGroup in api container' Security Context
+  ## @param api.containerSecurityContext.runAsNonRoot Set runAsNonRoot in api container' Security Context
+  ## @param api.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in api container' Security Context
+  ## @param api.containerSecurityContext.privileged Set privileged in api container' Security Context
+  ## @param api.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in api container' Security Context
+  ## @param api.containerSecurityContext.capabilities.drop List of capabilities to be dropped in api container
+  ## @param api.containerSecurityContext.seccompProfile.type Set seccomp profile in api container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param api.existingConfigmap The name of an existing ConfigMap with your custom configuration for api
+  ##
+  existingConfigmap: ""
+  ## @param api.command Override default api container command (useful when using custom images)
+  ##
+  command: []
+  ## @param api.args Override default api container args (useful when using custom images)
+  ##
+  args: []
+  ## @param api.automountServiceAccountToken Mount Service Account token in api pods
+  ##
+  automountServiceAccountToken: false
+  ## @param api.hostAliases api pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param api.deploymentAnnotations Annotations for api deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param api.podLabels Extra labels for api pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param api.podAnnotations Annotations for api pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param api.podAffinityPreset Pod affinity preset. Ignored if `api.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param api.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `api.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node api.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param api.nodeAffinityPreset.type Node affinity preset type. Ignored if `api.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param api.nodeAffinityPreset.key Node label key to match. Ignored if `api.affinity` is set
+    ##
+    key: ""
+    ## @param api.nodeAffinityPreset.values Node label values to match. Ignored if `api.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param api.affinity Affinity for api pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `api.podAffinityPreset`, `api.podAntiAffinityPreset`, and `api.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param api.nodeSelector Node labels for api pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param api.tolerations Tolerations for api pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param api.updateStrategy.type api deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param api.updateStrategy.type api statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param api.podManagementPolicy Pod management policy for api statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param api.priorityClassName api pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param api.topologySpreadConstraints Topology Spread Constraints for api pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param api.schedulerName Name of the k8s scheduler (other than default) for api pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param api.terminationGracePeriodSeconds Seconds api pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param api.lifecycleHooks for api containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param api.extraEnvVars Array with extra environment variables to add to api containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param api.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for api containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param api.extraEnvVarsSecret Name of existing Secret containing extra env vars for api containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param api.extraVolumes Optionally specify extra list of additional volumes for the api pods
+  ##
+  extraVolumes: []
+  ## @param api.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the api containers
+  ##
+  extraVolumeMounts: []
+  ## @param api.sidecars Add additional sidecar containers to the api pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param api.initContainers Add additional init containers to the api pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param api.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param api.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param api.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `api.pdb.minAvailable` and `api.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param api.autoscaling.vpa.enabled Enable VPA for api pods
+    ## @param api.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param api.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param api.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param api.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param api.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param api.autoscaling.hpa.enabled Enable HPA for api pods
+    ## @param api.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param api.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param api.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param api.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+
+  ## api service parameters
+  ##
+  service:
+    ## @param service.type api service type
+    ##
+    type: ClusterIP
+    ## @param service.ports.http api service HTTP port
+    ## @param service.ports.https api service HTTPS port
+    ##
+    ports:
+      http: 3000
+    ## Node ports to expose
+    ## @param service.nodePorts.http Node port for HTTP
+    ## @param service.nodePorts.https Node port for HTTPS
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+    ## @param service.clusterIP api service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param service.loadBalancerIP api service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param service.loadBalancerSourceRanges api service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.externalTrafficPolicy api service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param service.annotations Additional custom annotations for api service
+    ##
+    annotations: {}
+    ## @param service.extraPorts Extra ports to expose in api service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+  ## api ingress parameters
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for api
+    ##
+    enabled: false
+    ## @param ingress.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param ingress.hostname Default host for the ingress record
+    ##
+    hostname: basalt.local
+    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param ingress.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## You can:
+    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##
+    tls: false
+    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: %%COMPONENT_NAME%%.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - %%COMPONENT_NAME%%.local
+    ##   secretName: %%COMPONENT_NAME%%.local-tls
+    ##
+    extraTls: []
+    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: %%COMPONENT_NAME%%.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+
+  ## @section Other Parameters
+  ##
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
+## @section publicApi Parameters
+##
+
+## publicApi container/pod description
+##
+publicApi:
+  ## Basalt publicApi image
+  ## @param publicApi.image.registry [default: REGISTRY_NAME] publicApi image registry
+  ## @param publicApi.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] publicApi image repository
+  ## @skip publicApi.image.tag publicApi image tag (immutable tags are recommended)
+  ## @param publicApi.image.digest publicApi image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param publicApi.image.pullPolicy publicApi image pull policy
+  ## @param publicApi.image.pullSecrets publicApi image pull secrets
+  ## @param publicApi.image.debug Enable publicApi image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/public-api
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param publicApi.replicaCount Number of publicApi replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param publicApi.containerPorts.http publicApi HTTP container port
+  ##
+  containerPorts:
+    http: 3000
+  ## @param publicApi.extraContainerPorts Optionally specify extra list of additional ports for publicApi containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## Configure extra options for publicApi containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param publicApi.livenessProbe.enabled Enable livenessProbe on publicApi containers
+  ## @param publicApi.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param publicApi.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param publicApi.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param publicApi.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param publicApi.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param publicApi.readinessProbe.enabled Enable readinessProbe on publicApi containers
+  ## @param publicApi.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param publicApi.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param publicApi.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param publicApi.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param publicApi.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param publicApi.startupProbe.enabled Enable startupProbe on publicApi containers
+  ## @param publicApi.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param publicApi.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param publicApi.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param publicApi.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param publicApi.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param publicApi.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param publicApi.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param publicApi.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## @param publicApi.resources Set publicApi container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param publicApi.podSecurityContext.enabled Enable publicApi pods' Security Context
+  ## @param publicApi.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for publicApi pods
+  ## @param publicApi.podSecurityContext.sysctls Set kernel settings using the sysctl interface for publicApi pods
+  ## @param publicApi.podSecurityContext.supplementalGroups Set filesystem extra groups for publicApi pods
+  ## @param publicApi.podSecurityContext.fsGroup Set fsGroup in publicApi pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param publicApi.containerSecurityContext.enabled Enabled publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in publicApi container
+  ## @param publicApi.containerSecurityContext.runAsUser Set runAsUser in publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.runAsGroup Set runAsGroup in publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.runAsNonRoot Set runAsNonRoot in publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.privileged Set privileged in publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in publicApi container' Security Context
+  ## @param publicApi.containerSecurityContext.capabilities.drop List of capabilities to be dropped in publicApi container
+  ## @param publicApi.containerSecurityContext.seccompProfile.type Set seccomp profile in publicApi container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param publicApi.existingConfigmap The name of an existing ConfigMap with your custom configuration for publicApi
+  ##
+  existingConfigmap: ""
+  ## @param publicApi.command Override default publicApi container command (useful when using custom images)
+  ##
+  command: []
+  ## @param publicApi.args Override default publicApi container args (useful when using custom images)
+  ##
+  args: []
+  ## @param publicApi.automountServiceAccountToken Mount Service Account token in publicApi pods
+  ##
+  automountServiceAccountToken: false
+  ## @param publicApi.hostAliases publicApi pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param publicApi.deploymentAnnotations Annotations for publicApi deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param publicApi.podLabels Extra labels for publicApi pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param publicApi.podAnnotations Annotations for publicApi pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param publicApi.podAffinityPreset Pod affinity preset. Ignored if `publicApi.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param publicApi.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `publicApi.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node publicApi.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param publicApi.nodeAffinityPreset.type Node affinity preset type. Ignored if `publicApi.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param publicApi.nodeAffinityPreset.key Node label key to match. Ignored if `publicApi.affinity` is set
+    ##
+    key: ""
+    ## @param publicApi.nodeAffinityPreset.values Node label values to match. Ignored if `publicApi.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param publicApi.affinity Affinity for publicApi pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `publicApi.podAffinityPreset`, `publicApi.podAntiAffinityPreset`, and `publicApi.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param publicApi.nodeSelector Node labels for publicApi pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param publicApi.tolerations Tolerations for publicApi pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param publicApi.updateStrategy.type publicApi deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param publicApi.updateStrategy.type publicApi statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param publicApi.podManagementPolicy Pod management policy for publicApi statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param publicApi.priorityClassName publicApi pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param publicApi.topologySpreadConstraints Topology Spread Constraints for publicApi pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param publicApi.schedulerName Name of the k8s scheduler (other than default) for publicApi pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param publicApi.terminationGracePeriodSeconds Seconds publicApi pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param publicApi.lifecycleHooks for publicApi containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param publicApi.extraEnvVars Array with extra environment variables to add to publicApi containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param publicApi.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for publicApi containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param publicApi.extraEnvVarsSecret Name of existing Secret containing extra env vars for publicApi containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param publicApi.extraVolumes Optionally specify extra list of additional volumes for the publicApi pods
+  ##
+  extraVolumes: []
+  ## @param publicApi.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the publicApi containers
+  ##
+  extraVolumeMounts: []
+  ## @param publicApi.sidecars Add additional sidecar containers to the publicApi pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param publicApi.initContainers Add additional init containers to the publicApi pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param publicApi.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param publicApi.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param publicApi.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `publicApi.pdb.minAvailable` and `publicApi.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param publicApi.autoscaling.vpa.enabled Enable VPA for publicApi pods
+    ## @param publicApi.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param publicApi.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param publicApi.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param publicApi.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param publicApi.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param publicApi.autoscaling.hpa.enabled Enable HPA for publicApi pods
+    ## @param publicApi.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param publicApi.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param publicApi.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param publicApi.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+
+  ## publicApi service parameters
+  ##
+  service:
+    ## @param service.type publicApi service type
+    ##
+    type: ClusterIP
+    ## @param service.ports.http publicApi service HTTP port
+    ## @param service.ports.https publicApi service HTTPS port
+    ##
+    ports:
+      http: 3000
+    ## Node ports to expose
+    ## @param service.nodePorts.http Node port for HTTP
+    ## @param service.nodePorts.https Node port for HTTPS
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+    ## @param service.clusterIP publicApi service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param service.loadBalancerIP publicApi service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param service.loadBalancerSourceRanges publicApi service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.externalTrafficPolicy publicApi service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param service.annotations Additional custom annotations for publicApi service
+    ##
+    annotations: {}
+    ## @param service.extraPorts Extra ports to expose in publicApi service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+  ## publicApi ingress parameters
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for publicApi
+    ##
+    enabled: false
+    ## @param ingress.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param ingress.hostname Default host for the ingress record
+    ##
+    hostname: basalt.local
+    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param ingress.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## You can:
+    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##
+    tls: false
+    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: %%COMPONENT_NAME%%.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - %%COMPONENT_NAME%%.local
+    ##   secretName: %%COMPONENT_NAME%%.local-tls
+    ##
+    extraTls: []
+    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: %%COMPONENT_NAME%%.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+
+  ## @section Other Parameters
+  ##
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
+## @section otelCollector Parameters
+##
+
+## otelCollector container/pod description
+##
+otelCollector:
+  ## Basalt otelCollector image
+  ## @param otelCollector.image.registry [default: REGISTRY_NAME] otelCollector image registry
+  ## @param otelCollector.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] otelCollector image repository
+  ## @skip otelCollector.image.tag otelCollector image tag (immutable tags are recommended)
+  ## @param otelCollector.image.digest otelCollector image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param otelCollector.image.pullPolicy otelCollector image pull policy
+  ## @param otelCollector.image.pullSecrets otelCollector image pull secrets
+  ## @param otelCollector.image.debug Enable otelCollector image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/otel-collector
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param otelCollector.replicaCount Number of otelCollector replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param otelCollector.containerPorts.http otelCollector HTTP container port
+  ##
+  containerPorts:
+    grpc: 4317
+    http: 4318
+    hc: 13133
+  ## @param otelCollector.extraContainerPorts Optionally specify extra list of additional ports for otelCollector containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## Configure extra options for otelCollector containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param otelCollector.livenessProbe.enabled Enable livenessProbe on otelCollector containers
+  ## @param otelCollector.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param otelCollector.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param otelCollector.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param otelCollector.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param otelCollector.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param otelCollector.readinessProbe.enabled Enable readinessProbe on otelCollector containers
+  ## @param otelCollector.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param otelCollector.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param otelCollector.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param otelCollector.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param otelCollector.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param otelCollector.startupProbe.enabled Enable startupProbe on otelCollector containers
+  ## @param otelCollector.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param otelCollector.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param otelCollector.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param otelCollector.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param otelCollector.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param otelCollector.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param otelCollector.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param otelCollector.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## @param otelCollector.resources Set otelCollector container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param otelCollector.podSecurityContext.enabled Enable otelCollector pods' Security Context
+  ## @param otelCollector.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for otelCollector pods
+  ## @param otelCollector.podSecurityContext.sysctls Set kernel settings using the sysctl interface for otelCollector pods
+  ## @param otelCollector.podSecurityContext.supplementalGroups Set filesystem extra groups for otelCollector pods
+  ## @param otelCollector.podSecurityContext.fsGroup Set fsGroup in otelCollector pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param otelCollector.containerSecurityContext.enabled Enabled otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in otelCollector container
+  ## @param otelCollector.containerSecurityContext.runAsUser Set runAsUser in otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.runAsGroup Set runAsGroup in otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.runAsNonRoot Set runAsNonRoot in otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.privileged Set privileged in otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in otelCollector container' Security Context
+  ## @param otelCollector.containerSecurityContext.capabilities.drop List of capabilities to be dropped in otelCollector container
+  ## @param otelCollector.containerSecurityContext.seccompProfile.type Set seccomp profile in otelCollector container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param otelCollector.existingConfigmap The name of an existing ConfigMap with your custom configuration for otelCollector
+  ##
+  existingConfigmap: ""
+  ## @param otelCollector.command Override default otelCollector container command (useful when using custom images)
+  ##
+  command: []
+  ## @param otelCollector.args Override default otelCollector container args (useful when using custom images)
+  ##
+  args: []
+  ## @param otelCollector.automountServiceAccountToken Mount Service Account token in otelCollector pods
+  ##
+  automountServiceAccountToken: false
+  ## @param otelCollector.hostAliases otelCollector pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param otelCollector.deploymentAnnotations Annotations for otelCollector deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param otelCollector.podLabels Extra labels for otelCollector pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param otelCollector.podAnnotations Annotations for otelCollector pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param otelCollector.podAffinityPreset Pod affinity preset. Ignored if `otelCollector.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param otelCollector.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `otelCollector.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node otelCollector.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param otelCollector.nodeAffinityPreset.type Node affinity preset type. Ignored if `otelCollector.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param otelCollector.nodeAffinityPreset.key Node label key to match. Ignored if `otelCollector.affinity` is set
+    ##
+    key: ""
+    ## @param otelCollector.nodeAffinityPreset.values Node label values to match. Ignored if `otelCollector.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param otelCollector.affinity Affinity for otelCollector pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `otelCollector.podAffinityPreset`, `otelCollector.podAntiAffinityPreset`, and `otelCollector.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param otelCollector.nodeSelector Node labels for otelCollector pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param otelCollector.tolerations Tolerations for otelCollector pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param otelCollector.updateStrategy.type otelCollector deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param otelCollector.updateStrategy.type otelCollector statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param otelCollector.podManagementPolicy Pod management policy for otelCollector statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param otelCollector.priorityClassName otelCollector pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param otelCollector.topologySpreadConstraints Topology Spread Constraints for otelCollector pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param otelCollector.schedulerName Name of the k8s scheduler (other than default) for otelCollector pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param otelCollector.terminationGracePeriodSeconds Seconds otelCollector pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param otelCollector.lifecycleHooks for otelCollector containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param otelCollector.extraEnvVars Array with extra environment variables to add to otelCollector containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param otelCollector.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for otelCollector containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param otelCollector.extraEnvVarsSecret Name of existing Secret containing extra env vars for otelCollector containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param otelCollector.extraVolumes Optionally specify extra list of additional volumes for the otelCollector pods
+  ##
+  extraVolumes: []
+  ## @param otelCollector.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the otelCollector containers
+  ##
+  extraVolumeMounts: []
+  ## @param otelCollector.sidecars Add additional sidecar containers to the otelCollector pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param otelCollector.initContainers Add additional init containers to the otelCollector pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param otelCollector.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param otelCollector.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param otelCollector.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `otelCollector.pdb.minAvailable` and `otelCollector.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param otelCollector.autoscaling.vpa.enabled Enable VPA for otelCollector pods
+    ## @param otelCollector.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param otelCollector.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param otelCollector.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param otelCollector.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param otelCollector.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param otelCollector.autoscaling.hpa.enabled Enable HPA for otelCollector pods
+    ## @param otelCollector.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param otelCollector.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param otelCollector.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param otelCollector.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+
+  ## otelCollector HTTP service parameters
+  ##
+  serviceHttp:
+    ## @param serviceHttp.type otelCollector HTTP service type
+    ##
+    type: ClusterIP
+    ## @param serviceHttp.ports.http otelCollector service HTTP port
+    ##
+    ports:
+      http: 4318
+    ## Node ports to expose
+    ## @param serviceHttp.nodePorts.http Node port for HTTP
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+    ## @param serviceHttp.clusterIP otelCollector HTTP service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param serviceHttp.loadBalancerIP otelCollector HTTP service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param serviceHttp.loadBalancerSourceRanges otelCollector HTTP service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param serviceHttp.externalTrafficPolicy otelCollector HTTP service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param serviceHttp.annotations Additional custom annotations for otelCollector HTTP service
+    ##
+    annotations: {}
+    ## @param serviceHttp.extraPorts Extra ports to expose in otelCollector HTTP service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param serviceHttp.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param serviceHttp.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## otelCollector gRPC service parameters
+  ##
+  serviceGrpc:
+    ## @param serviceGrpc.type otelCollector gRPC service type
+    ##
+    type: ClusterIP
+    ## @param serviceGrpc.ports.grpc otelCollector service gRPC port
+    ##
+    ports:
+      grpc: 4317
+    ## Node ports to expose
+    ## @param serviceGrpc.nodePorts.grpc Node port for gRPC
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      grpc: ""
+    ## @param serviceGrpc.clusterIP otelCollector gRPC service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param serviceGrpc.loadBalancerIP otelCollector gRPC service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param serviceGrpc.loadBalancerSourceRanges otelCollector gRPC service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param serviceGrpc.externalTrafficPolicy otelCollector gRPC service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param serviceGrpc.annotations Additional custom annotations for otelCollector gRPC service
+    ##
+    annotations: {}
+    ## @param serviceGrpc.extraPorts Extra ports to expose in otelCollector gRPC service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param serviceGrpc.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param serviceGrpc.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+  ## otelCollector ingress parameters for HTTP
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingressHttp:
+    ## @param ingressHttp.enabled Enable ingress record generation for otelCollector HTTP
+    ##
+    enabled: false
+    ## @param ingressHttp.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingressHttp.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param ingressHttp.hostname Default host for the ingress record
+    ##
+    hostname: basalt.local
+    ## @param ingressHttp.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param ingressHttp.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param ingressHttp.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param ingressHttp.tls Enable TLS configuration for the host defined at `ingressHttp.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingressHttp.hostname }}`
+    ## You can:
+    ##   - Use the `ingressHttp.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `ingressHttp.selfSigned=true`
+    ##
+    tls: false
+    ## @param ingressHttp.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param ingressHttp.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: %%COMPONENT_NAME%%.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param ingressHttp.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param ingressHttp.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - %%COMPONENT_NAME%%.local
+    ##   secretName: %%COMPONENT_NAME%%.local-tls
+    ##
+    extraTls: []
+    ## @param ingressHttp.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: %%COMPONENT_NAME%%.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param ingressHttp.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+  ## otelCollector ingress parameters for GRPC
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingressGrpc:
+    ## @param ingressGrpc.enabled Enable ingress record generation for otelCollector GRPC
+    ##
+    enabled: false
+    ## @param ingressGrpc.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingressGrpc.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param ingressGrpc.hostname Default host for the ingress record
+    ##
+    hostname: basalt.local
+    ## @param ingressGrpc.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param ingressGrpc.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param ingressGrpc.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param ingressGrpc.tls Enable TLS configuration for the host defined at `ingressGrpc.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingressGrpc.hostname }}`
+    ## You can:
+    ##   - Use the `ingressGrpc.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `ingressGrpc.selfSigned=true`
+    ##
+    tls: false
+    ## @param ingressGrpc.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param ingressGrpc.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: %%COMPONENT_NAME%%.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param ingressGrpc.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param ingressGrpc.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - %%COMPONENT_NAME%%.local
+    ##   secretName: %%COMPONENT_NAME%%.local-tls
+    ##
+    extraTls: []
+    ## @param ingressGrpc.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: %%COMPONENT_NAME%%.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param ingressGrpc.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+
+  ## @section Other Parameters
+  ##
+  ## @param otelCollector.redisDb Redis database number for OTel Collector (mapped to REDIS_DB environment variable)
+  redisDb: 0
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
+## webApp container/pod description
+##
+webApp:
+  ## Basalt webApp image
+  ## @param webApp.image.registry [default: REGISTRY_NAME] webApp image registry
+  ## @param webApp.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] webApp image repository
+  ## @skip webApp.image.tag webApp image tag (immutable tags are recommended)
+  ## @param webApp.image.digest webApp image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param webApp.image.pullPolicy webApp image pull policy
+  ## @param webApp.image.pullSecrets webApp image pull secrets
+  ## @param webApp.image.debug Enable webApp image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/web-app
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param webApp.replicaCount Number of webApp replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param webApp.containerPorts.http webApp HTTP container port
+  ##
+  containerPorts:
+    http: 8080
+  ## @param webApp.extraContainerPorts Optionally specify extra list of additional ports for webApp containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## Configure extra options for webApp containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param webApp.livenessProbe.enabled Enable livenessProbe on webApp containers
+  ## @param webApp.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param webApp.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param webApp.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param webApp.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param webApp.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param webApp.readinessProbe.enabled Enable readinessProbe on webApp containers
+  ## @param webApp.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param webApp.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param webApp.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param webApp.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param webApp.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param webApp.startupProbe.enabled Enable startupProbe on webApp containers
+  ## @param webApp.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param webApp.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param webApp.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param webApp.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param webApp.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param webApp.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param webApp.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param webApp.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## @param webApp.resources Set webApp container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param webApp.podSecurityContext.enabled Enable webApp pods' Security Context
+  ## @param webApp.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for webApp pods
+  ## @param webApp.podSecurityContext.sysctls Set kernel settings using the sysctl interface for webApp pods
+  ## @param webApp.podSecurityContext.supplementalGroups Set filesystem extra groups for webApp pods
+  ## @param webApp.podSecurityContext.fsGroup Set fsGroup in webApp pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param webApp.containerSecurityContext.enabled Enabled webApp container' Security Context
+  ## @param webApp.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in webApp container
+  ## @param webApp.containerSecurityContext.runAsUser Set runAsUser in webApp container' Security Context
+  ## @param webApp.containerSecurityContext.runAsGroup Set runAsGroup in webApp container' Security Context
+  ## @param webApp.containerSecurityContext.runAsNonRoot Set runAsNonRoot in webApp container' Security Context
+  ## @param webApp.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in webApp container' Security Context
+  ## @param webApp.containerSecurityContext.privileged Set privileged in webApp container' Security Context
+  ## @param webApp.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in webApp container' Security Context
+  ## @param webApp.containerSecurityContext.capabilities.drop List of capabilities to be dropped in webApp container
+  ## @param webApp.containerSecurityContext.seccompProfile.type Set seccomp profile in webApp container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param webApp.existingConfigmap The name of an existing ConfigMap with your custom configuration for webApp
+  ##
+  existingConfigmap: ""
+  ## @param webApp.command Override default webApp container command (useful when using custom images)
+  ##
+  command: []
+  ## @param webApp.args Override default webApp container args (useful when using custom images)
+  ##
+  args: []
+  ## @param webApp.automountServiceAccountToken Mount Service Account token in webApp pods
+  ##
+  automountServiceAccountToken: false
+  ## @param webApp.hostAliases webApp pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param webApp.deploymentAnnotations Annotations for webApp deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param webApp.podLabels Extra labels for webApp pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param webApp.podAnnotations Annotations for webApp pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param webApp.podAffinityPreset Pod affinity preset. Ignored if `webApp.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param webApp.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `webApp.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node webApp.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param webApp.nodeAffinityPreset.type Node affinity preset type. Ignored if `webApp.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param webApp.nodeAffinityPreset.key Node label key to match. Ignored if `webApp.affinity` is set
+    ##
+    key: ""
+    ## @param webApp.nodeAffinityPreset.values Node label values to match. Ignored if `webApp.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param webApp.affinity Affinity for webApp pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `webApp.podAffinityPreset`, `webApp.podAntiAffinityPreset`, and `webApp.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param webApp.nodeSelector Node labels for webApp pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param webApp.tolerations Tolerations for webApp pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param webApp.updateStrategy.type webApp deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param webApp.updateStrategy.type webApp statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param webApp.podManagementPolicy Pod management policy for webApp statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param webApp.priorityClassName webApp pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param webApp.topologySpreadConstraints Topology Spread Constraints for webApp pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param webApp.schedulerName Name of the k8s scheduler (other than default) for webApp pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param webApp.terminationGracePeriodSeconds Seconds webApp pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param webApp.lifecycleHooks for webApp containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param webApp.extraEnvVars Array with extra environment variables to add to webApp containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param webApp.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for webApp containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param webApp.extraEnvVarsSecret Name of existing Secret containing extra env vars for webApp containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param webApp.extraVolumes Optionally specify extra list of additional volumes for the webApp pods
+  ##
+  extraVolumes: []
+  ## @param webApp.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the webApp containers
+  ##
+  extraVolumeMounts: []
+  ## @param webApp.sidecars Add additional sidecar containers to the webApp pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param webApp.initContainers Add additional init containers to the webApp pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param webApp.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param webApp.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param webApp.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `webApp.pdb.minAvailable` and `webApp.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param webApp.autoscaling.vpa.enabled Enable VPA for webApp pods
+    ## @param webApp.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param webApp.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param webApp.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param webApp.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param webApp.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param webApp.autoscaling.hpa.enabled Enable HPA for webApp pods
+    ## @param webApp.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param webApp.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param webApp.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param webApp.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+
+  ## webApp service parameters
+  ##
+  service:
+    ## @param service.type webApp service type
+    ##
+    type: ClusterIP
+    ## @param service.ports.http webApp service HTTP port
+    ## @param service.ports.https webApp service HTTPS port
+    ##
+    ports:
+      http: 8080
+    ## Node ports to expose
+    ## @param service.nodePorts.http Node port for HTTP
+    ## @param service.nodePorts.https Node port for HTTPS
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+    ## @param service.clusterIP webApp service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param service.loadBalancerIP webApp service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param service.loadBalancerSourceRanges webApp service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.externalTrafficPolicy webApp service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param service.annotations Additional custom annotations for webApp service
+    ##
+    annotations: {}
+    ## @param service.extraPorts Extra ports to expose in webApp service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+  ## webApp ingress parameters
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for webApp
+    ##
+    enabled: false
+    ## @param ingress.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param ingress.hostname Default host for the ingress record
+    ##
+    hostname: basalt.local
+    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param ingress.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## You can:
+    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##
+    tls: false
+    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: %%COMPONENT_NAME%%.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - %%COMPONENT_NAME%%.local
+    ##   secretName: %%COMPONENT_NAME%%.local-tls
+    ##
+    extraTls: []
+    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: %%COMPONENT_NAME%%.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+
+  ## @section Other Parameters
+  ##
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
+## jobsRunner container/pod description
+##
+jobsRunner:
+  ## Basalt jobsRunner image
+  ## @param jobsRunner.image.registry [default: REGISTRY_NAME] jobsRunner image registry
+  ## @param jobsRunner.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] jobsRunner image repository
+  ## @skip jobsRunner.image.tag jobsRunner image tag (immutable tags are recommended)
+  ## @param jobsRunner.image.digest jobsRunner image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param jobsRunner.image.pullPolicy jobsRunner image pull policy
+  ## @param jobsRunner.image.pullSecrets jobsRunner image pull secrets
+  ## @param jobsRunner.image.debug Enable jobsRunner image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/jobs-runner
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param jobsRunner.replicaCount Number of jobsRunner replicas to deploy
+  ##
+  replicaCount: 1
+  ## Configure extra options for jobsRunner containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param jobsRunner.livenessProbe.enabled Enable livenessProbe on jobsRunner containers
+  ## @param jobsRunner.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param jobsRunner.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param jobsRunner.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param jobsRunner.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param jobsRunner.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param jobsRunner.readinessProbe.enabled Enable readinessProbe on jobsRunner containers
+  ## @param jobsRunner.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param jobsRunner.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param jobsRunner.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param jobsRunner.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param jobsRunner.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param jobsRunner.startupProbe.enabled Enable startupProbe on jobsRunner containers
+  ## @param jobsRunner.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param jobsRunner.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param jobsRunner.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param jobsRunner.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param jobsRunner.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param jobsRunner.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param jobsRunner.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param jobsRunner.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## @param jobsRunner.resources Set jobsRunner container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param jobsRunner.podSecurityContext.enabled Enable jobsRunner pods' Security Context
+  ## @param jobsRunner.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for jobsRunner pods
+  ## @param jobsRunner.podSecurityContext.sysctls Set kernel settings using the sysctl interface for jobsRunner pods
+  ## @param jobsRunner.podSecurityContext.supplementalGroups Set filesystem extra groups for jobsRunner pods
+  ## @param jobsRunner.podSecurityContext.fsGroup Set fsGroup in jobsRunner pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param jobsRunner.containerSecurityContext.enabled Enabled jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in jobsRunner container
+  ## @param jobsRunner.containerSecurityContext.runAsUser Set runAsUser in jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.runAsGroup Set runAsGroup in jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.runAsNonRoot Set runAsNonRoot in jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.privileged Set privileged in jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in jobsRunner container' Security Context
+  ## @param jobsRunner.containerSecurityContext.capabilities.drop List of capabilities to be dropped in jobsRunner container
+  ## @param jobsRunner.containerSecurityContext.seccompProfile.type Set seccomp profile in jobsRunner container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param jobsRunner.existingConfigmap The name of an existing ConfigMap with your custom configuration for jobsRunner
+  ##
+  existingConfigmap: ""
+  ## @param jobsRunner.command Override default jobsRunner container command (useful when using custom images)
+  ##
+  command: []
+  ## @param jobsRunner.args Override default jobsRunner container args (useful when using custom images)
+  ##
+  args: []
+  ## @param jobsRunner.automountServiceAccountToken Mount Service Account token in jobsRunner pods
+  ##
+  automountServiceAccountToken: false
+  ## @param jobsRunner.hostAliases jobsRunner pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param jobsRunner.deploymentAnnotations Annotations for jobsRunner deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param jobsRunner.podLabels Extra labels for jobsRunner pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param jobsRunner.podAnnotations Annotations for jobsRunner pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param jobsRunner.podAffinityPreset Pod affinity preset. Ignored if `jobsRunner.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param jobsRunner.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `jobsRunner.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node jobsRunner.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param jobsRunner.nodeAffinityPreset.type Node affinity preset type. Ignored if `jobsRunner.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param jobsRunner.nodeAffinityPreset.key Node label key to match. Ignored if `jobsRunner.affinity` is set
+    ##
+    key: ""
+    ## @param jobsRunner.nodeAffinityPreset.values Node label values to match. Ignored if `jobsRunner.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param jobsRunner.affinity Affinity for jobsRunner pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `jobsRunner.podAffinityPreset`, `jobsRunner.podAntiAffinityPreset`, and `jobsRunner.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param jobsRunner.nodeSelector Node labels for jobsRunner pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param jobsRunner.tolerations Tolerations for jobsRunner pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param jobsRunner.updateStrategy.type jobsRunner deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param jobsRunner.updateStrategy.type jobsRunner statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param jobsRunner.podManagementPolicy Pod management policy for jobsRunner statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param jobsRunner.priorityClassName jobsRunner pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param jobsRunner.topologySpreadConstraints Topology Spread Constraints for jobsRunner pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param jobsRunner.schedulerName Name of the k8s scheduler (other than default) for jobsRunner pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param jobsRunner.terminationGracePeriodSeconds Seconds jobsRunner pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param jobsRunner.lifecycleHooks for jobsRunner containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param jobsRunner.extraEnvVars Array with extra environment variables to add to jobsRunner containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param jobsRunner.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for jobsRunner containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param jobsRunner.extraEnvVarsSecret Name of existing Secret containing extra env vars for jobsRunner containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param jobsRunner.extraVolumes Optionally specify extra list of additional volumes for the jobsRunner pods
+  ##
+  extraVolumes: []
+  ## @param jobsRunner.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the jobsRunner containers
+  ##
+  extraVolumeMounts: []
+  ## @param jobsRunner.sidecars Add additional sidecar containers to the jobsRunner pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param jobsRunner.initContainers Add additional init containers to the jobsRunner pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param jobsRunner.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param jobsRunner.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param jobsRunner.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `jobsRunner.pdb.minAvailable` and `jobsRunner.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param jobsRunner.autoscaling.vpa.enabled Enable VPA for jobsRunner pods
+    ## @param jobsRunner.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param jobsRunner.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param jobsRunner.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param jobsRunner.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param jobsRunner.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param jobsRunner.autoscaling.hpa.enabled Enable HPA for jobsRunner pods
+    ## @param jobsRunner.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param jobsRunner.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param jobsRunner.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param jobsRunner.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+
+  ## @section Other Parameters
+  ##
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
+## otelSqsProcessor container/pod description
+##
+otelSqsProcessor:
+  ## Basalt otelSqsProcessor image
+  ## @param otelSqsProcessor.image.registry [default: REGISTRY_NAME] otelSqsProcessor image registry
+  ## @param otelSqsProcessor.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] otelSqsProcessor image repository
+  ## @skip otelSqsProcessor.image.tag otelSqsProcessor image tag (immutable tags are recommended)
+  ## @param otelSqsProcessor.image.digest otelSqsProcessor image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param otelSqsProcessor.image.pullPolicy otelSqsProcessor image pull policy
+  ## @param otelSqsProcessor.image.pullSecrets otelSqsProcessor image pull secrets
+  ## @param otelSqsProcessor.image.debug Enable otelSqsProcessor image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/otel-sqs-processor
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param otelSqsProcessor.replicaCount Number of otelSqsProcessor replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param otelSqsProcessor.resources Set otelSqsProcessor container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param otelSqsProcessor.podSecurityContext.enabled Enable otelSqsProcessor pods' Security Context
+  ## @param otelSqsProcessor.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for otelSqsProcessor pods
+  ## @param otelSqsProcessor.podSecurityContext.sysctls Set kernel settings using the sysctl interface for otelSqsProcessor pods
+  ## @param otelSqsProcessor.podSecurityContext.supplementalGroups Set filesystem extra groups for otelSqsProcessor pods
+  ## @param otelSqsProcessor.podSecurityContext.fsGroup Set fsGroup in otelSqsProcessor pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param otelSqsProcessor.containerSecurityContext.enabled Enabled otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in otelSqsProcessor container
+  ## @param otelSqsProcessor.containerSecurityContext.runAsUser Set runAsUser in otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.runAsGroup Set runAsGroup in otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.runAsNonRoot Set runAsNonRoot in otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.privileged Set privileged in otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in otelSqsProcessor container' Security Context
+  ## @param otelSqsProcessor.containerSecurityContext.capabilities.drop List of capabilities to be dropped in otelSqsProcessor container
+  ## @param otelSqsProcessor.containerSecurityContext.seccompProfile.type Set seccomp profile in otelSqsProcessor container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param otelSqsProcessor.existingConfigmap The name of an existing ConfigMap with your custom configuration for otelSqsProcessor
+  ##
+  existingConfigmap: ""
+  ## @param otelSqsProcessor.command Override default otelSqsProcessor container command (useful when using custom images)
+  ##
+  command: []
+  ## @param otelSqsProcessor.args Override default otelSqsProcessor container args (useful when using custom images)
+  ##
+  args: []
+  ## @param otelSqsProcessor.automountServiceAccountToken Mount Service Account token in otelSqsProcessor pods
+  ##
+  automountServiceAccountToken: false
+  ## @param otelSqsProcessor.hostAliases otelSqsProcessor pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param otelSqsProcessor.deploymentAnnotations Annotations for otelSqsProcessor deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param otelSqsProcessor.podLabels Extra labels for otelSqsProcessor pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param otelSqsProcessor.podAnnotations Annotations for otelSqsProcessor pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param otelSqsProcessor.podAffinityPreset Pod affinity preset. Ignored if `otelSqsProcessor.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param otelSqsProcessor.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `otelSqsProcessor.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node otelSqsProcessor.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param otelSqsProcessor.nodeAffinityPreset.type Node affinity preset type. Ignored if `otelSqsProcessor.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param otelSqsProcessor.nodeAffinityPreset.key Node label key to match. Ignored if `otelSqsProcessor.affinity` is set
+    ##
+    key: ""
+    ## @param otelSqsProcessor.nodeAffinityPreset.values Node label values to match. Ignored if `otelSqsProcessor.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param otelSqsProcessor.affinity Affinity for otelSqsProcessor pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `otelSqsProcessor.podAffinityPreset`, `otelSqsProcessor.podAntiAffinityPreset`, and `otelSqsProcessor.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param otelSqsProcessor.nodeSelector Node labels for otelSqsProcessor pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param otelSqsProcessor.tolerations Tolerations for otelSqsProcessor pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param otelSqsProcessor.updateStrategy.type otelSqsProcessor deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param otelSqsProcessor.updateStrategy.type otelSqsProcessor statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param otelSqsProcessor.podManagementPolicy Pod management policy for otelSqsProcessor statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param otelSqsProcessor.priorityClassName otelSqsProcessor pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param otelSqsProcessor.topologySpreadConstraints Topology Spread Constraints for otelSqsProcessor pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param otelSqsProcessor.schedulerName Name of the k8s scheduler (other than default) for otelSqsProcessor pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param otelSqsProcessor.terminationGracePeriodSeconds Seconds otelSqsProcessor pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param otelSqsProcessor.lifecycleHooks for otelSqsProcessor containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param otelSqsProcessor.extraEnvVars Array with extra environment variables to add to otelSqsProcessor containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param otelSqsProcessor.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for otelSqsProcessor containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param otelSqsProcessor.extraEnvVarsSecret Name of existing Secret containing extra env vars for otelSqsProcessor containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param otelSqsProcessor.extraVolumes Optionally specify extra list of additional volumes for the otelSqsProcessor pods
+  ##
+  extraVolumes: []
+  ## @param otelSqsProcessor.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the otelSqsProcessor containers
+  ##
+  extraVolumeMounts: []
+  ## @param otelSqsProcessor.sidecars Add additional sidecar containers to the otelSqsProcessor pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param otelSqsProcessor.initContainers Add additional init containers to the otelSqsProcessor pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param otelSqsProcessor.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param otelSqsProcessor.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param otelSqsProcessor.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `otelSqsProcessor.pdb.minAvailable` and `otelSqsProcessor.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param otelSqsProcessor.autoscaling.vpa.enabled Enable VPA for otelSqsProcessor pods
+    ## @param otelSqsProcessor.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param otelSqsProcessor.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param otelSqsProcessor.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param otelSqsProcessor.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param otelSqsProcessor.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param otelSqsProcessor.autoscaling.hpa.enabled Enable HPA for otelSqsProcessor pods
+    ## @param otelSqsProcessor.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param otelSqsProcessor.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param otelSqsProcessor.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param otelSqsProcessor.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+
+  ## @section Other Parameters
+  ##
+  ## @param otelSqsProcessor.sqsQueueUrl SQS queue URL for processing (mapped to SQS_QUEUE_URL environment variable)
+  ##
+  sqsQueueUrl: ""
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
+## @section Migration job parameters
+##
+migration:
+  ## Basalt migration image
+  ## @param migration.image.registry [default: REGISTRY_NAME] migration image registry
+  ## @param migration.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] migration image repository
+  ## @skip migration.image.tag migration image tag (immutable tags are recommended)
+  ## @param migration.image.digest migration image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param migration.image.pullPolicy migration image pull policy
+  ## @param migration.image.pullSecrets migration image pull secrets
+  ## @param migration.image.debug Enable migration image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/db-migrations
+    tag: v3.10.6
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param migration.enabled Enable migration job
+  ##
+  enabled: true
+  ## @param migration.podLabels Additional pod labels
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param migration.podAnnotations Additional pod annotations
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param migration.automountServiceAccountToken Mount Service Account token in pod
+  ##
+  automountServiceAccountToken: false
+  ## @param migration.hostAliases Migration job host aliases
+  ##
+  hostAliases: []
+  ## @param migration.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param migration.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param migration.annotations [object] Provide any additional annotations which may be required.
+  ## This can be used to set the LoadBalancer service type to internal only.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+  ##
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  ## Pod security context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param migration.podSecurityContext.enabled Enabled Jaeger pods' Security Context
+  ## @param migration.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy
+  ## @param migration.podSecurityContext.sysctls Set kernel settings using the sysctl interface
+  ## @param migration.podSecurityContext.supplementalGroups Set filesystem extra groups
+  ## @param migration.podSecurityContext.fsGroup Set Jaeger pod's Security Context fsGroup
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## @param migration.containerSecurityContext.enabled Enabled containers' Security Context
+  ## @param migration.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in container
+  ## @param migration.containerSecurityContext.runAsUser Set containers' Security Context runAsUser
+  ## @param migration.containerSecurityContext.runAsGroup Set containers' Security Context runAsGroup
+  ## @param migration.containerSecurityContext.runAsNonRoot Set container's Security Context runAsNonRoot
+  ## @param migration.containerSecurityContext.privileged Set container's Security Context privileged
+  ## @param migration.containerSecurityContext.readOnlyRootFilesystem Set container's Security Context readOnlyRootFilesystem
+  ## @param migration.containerSecurityContext.allowPrivilegeEscalation Set container's Security Context allowPrivilegeEscalation
+  ## @param migration.containerSecurityContext.capabilities.drop List of capabilities to be dropped
+  ## @param migration.containerSecurityContext.seccompProfile.type Set container's Security Context seccomp profile
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    privileged: false
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+  ## @param migration.extraEnvVars Extra environment variables to be set on jaeger migration container
+  ## For example:
+  ##  - name: FOO
+  ##    value: BAR
+  ##
+  extraEnvVars: []
+  ## @param migration.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  ##
+  extraEnvVarsCM: ""
+  ## @param migration.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
+  ## @param migration.extraVolumeMounts Optionally specify extra list of additional volumeMounts for jaeger container
+  ##
+  extraVolumeMounts: []
+  ## @param migration.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## @param migration.extraVolumes Optionally specify extra list of additional volumes for jaeger container
+  ##
+  extraVolumes: []
+
+  ## @section Traffic Exposure Parameters
+  ##
+
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+
+config:
+  ## @param config.apiUrl API base URL (mapped to API_HOST environment variable)
+  apiUrl: ""
+  ## @param config.dashboardUrl Dashboard URL (mapped to DASHBOARD_HOST environment variable)
+  dashboardUrl: ""
+  ## @param config.sessionSecret Session secret for cookie encryption (used as direct value if sessionSecretKey is not set)
+  sessionSecret: ""
+  ## @param config.region AWS region (S3, SQS and Lambda)
+  region: ""
+  ## @param config.lambdaScriptEvaluatorName Lambda function name for script evaluator (mapped to EVALUATOR_SCRIPT_FUNCTION_NAME environment variable)
+  lambdaScriptEvaluatorName: ""
+  ## @param config.sessionSecretExistingSecret Name of existing secret containing session secret (optional)
+  ## If existingSecret AND sessionSecretKey are set, the value will be read from the secret.
+  ## Otherwise, the direct value (sessionSecret) will be used.
+  sessionSecretExistingSecret: ""
+  ## @param config.sessionSecretKey Key in existingSecret for session secret. If set with sessionSecretExistingSecret, SESSION_SECRET will use this secret key. Otherwise uses 'sessionSecret' value.
+  sessionSecretKey: ""
+  ## @param config.encryptionKey Encryption key for sensitive data (used as direct value if encryptionKeySecretKey is not set)
+  encryptionKey: ""
+  ## @param config.encryptionKeyExistingSecret Name of existing secret containing encryption key (optional)
+  ## If existingSecret AND encryptionKeySecretKey are set, the value will be read from the secret.
+  ## Otherwise, the direct value (encryptionKey) will be used.
+  encryptionKeyExistingSecret: ""
+  ## @param config.encryptionKeySecretKey Key in existingSecret for encryption key. If set with encryptionKeyExistingSecret, ENCRYPTION_KEY will use this secret key. Otherwise uses 'encryptionKey' value.
+  encryptionKeySecretKey: ""
+  ## Authentication configuration
+  auth:
+    ## Google OAuth configuration
+    google:
+      ## @param config.auth.google.enabled Enable Google OAuth authentication
+      enabled: false
+      ## @param config.auth.google.clientId Google OAuth client ID (used as direct value if clientIdKey is not set)
+      clientId: ""
+      ## @param config.auth.google.clientSecret Google OAuth client secret (used as direct value if clientSecretKey is not set)
+      clientSecret: ""
+      ## @param config.auth.google.existingSecret Name of existing secret containing Google OAuth credentials (optional)
+      ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
+      ## Otherwise, the direct value (clientId, clientSecret) will be used.
+      existingSecret: ""
+      ## @param config.auth.google.clientIdKey Key in existingSecret for Google OAuth client ID. If set with existingSecret, GOOGLE_CLIENT_ID will use this secret key. Otherwise uses 'clientId' value.
+      clientIdKey: ""
+      ## @param config.auth.google.clientSecretKey Key in existingSecret for Google OAuth client secret. If set with existingSecret, GOOGLE_CLIENT_SECRET will use this secret key. Otherwise uses 'clientSecret' value.
+      clientSecretKey: ""
+
+externalPostgres:
+  ## @param externalPostgres.host PostgreSQL host (used as direct value if hostKey is not set)
+  host: ""
+  ## @param externalPostgres.port PostgreSQL port (used as direct value if portKey is not set)
+  port: 5432
+  ## @param externalPostgres.database PostgreSQL database name (used as direct value if databaseKey is not set)
+  database: "basalt"
+  ## @param externalPostgres.user PostgreSQL user (used as direct value if userKey is not set)
+  user: ""
+  ## @param externalPostgres.password PostgreSQL password (used as direct value if passwordKey is not set)
+  password: ""
+  ## @param externalPostgres.existingSecret Name of existing secret containing PostgreSQL credentials (optional)
+  ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
+  ## Otherwise, the direct value (host, port, user, password, database) will be used.
+  ## This allows you to mix secret-based and direct values.
+  existingSecret: ""
+  ## @param externalPostgres.hostKey Key in existingSecret for PostgreSQL host. If set with existingSecret, DB_HOST and DB_HOST_REPLICA will use this secret key. Otherwise uses 'host' value.
+  hostKey: ""
+  ## @param externalPostgres.portKey Key in existingSecret for PostgreSQL port. If set with existingSecret, DB_PORT will use this secret key. Otherwise uses 'port' value.
+  portKey: ""
+  ## @param externalPostgres.databaseKey Key in existingSecret for PostgreSQL database name. If set with existingSecret, DB_NAME will use this secret key. Otherwise uses 'database' value.
+  databaseKey: ""
+  ## @param externalPostgres.userKey Key in existingSecret for PostgreSQL user. If set with existingSecret, DB_USER will use this secret key. Otherwise uses 'user' value.
+  userKey: ""
+  ## @param externalPostgres.passwordKey Key in existingSecret for PostgreSQL password. If set with existingSecret, DB_PASSWORD will use this secret key. Otherwise uses 'password' value.
+  passwordKey: ""
+
+externalClickhouse:
+  ## @param externalClickhouse.url Clickhouse URL (used as direct value if urlKey is not set)
+  url: ""
+  ## @param externalClickhouse.user Clickhouse user (used as direct value if userKey is not set)
+  user: ""
+  ## @param externalClickhouse.password Clickhouse password (used as direct value if passwordKey is not set)
+  password: ""
+  ## @param externalClickhouse.database Clickhouse database name (used as direct value if databaseKey is not set)
+  database: ""
+  ## @param externalClickhouse.existingSecret Name of existing secret containing Clickhouse credentials (optional)
+  ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
+  ## Otherwise, the direct value (url, user, password, database) will be used.
+  ## This allows you to mix secret-based and direct values.
+  existingSecret: ""
+  ## @param externalClickhouse.urlKey Key in existingSecret for Clickhouse URL. If set with existingSecret, CLICKHOUSE_URL will use this secret key. Otherwise uses 'url' value.
+  urlKey: ""
+  ## @param externalClickhouse.userKey Key in existingSecret for Clickhouse user. If set with existingSecret, CLICKHOUSE_USER will use this secret key. Otherwise uses 'user' value.
+  userKey: ""
+  ## @param externalClickhouse.passwordKey Key in existingSecret for Clickhouse password. If set with existingSecret, CLICKHOUSE_PASSWORD will use this secret key. Otherwise uses 'password' value.
+  passwordKey: ""
+  ## @param externalClickhouse.databaseKey Key in existingSecret for Clickhouse database name. If set with existingSecret, CLICKHOUSE_DB_NAME will use this secret key. Otherwise uses 'database' value.
+  databaseKey: ""
+
+externalRedis:
+  ## @param externalRedis.scheme Redis connection scheme (used as direct value if schemeKey is not set)
+  scheme: "redis://"
+  ## @param externalRedis.host Redis host (used as direct value if hostKey is not set)
+  host: ""
+  ## @param externalRedis.port Redis port (used as direct value if portKey is not set)
+  port: 6379
+  ## @param externalRedis.username Redis username (used as direct value if usernameKey is not set)
+  username: ""
+  ## @param externalRedis.password Redis password (used as direct value if passwordKey is not set)
+  password: ""
+  ## @param externalRedis.existingSecret Name of existing secret containing Redis credentials (optional)
+  ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
+  ## Otherwise, the direct value (scheme, host, port, username, password) will be used.
+  ## This allows you to mix secret-based and direct values.
+  existingSecret: ""
+  ## @param externalRedis.schemeKey Key in existingSecret for Redis scheme. If set with existingSecret, REDIS_SCHEME will use this secret key. Otherwise uses 'scheme' value.
+  schemeKey: ""
+  ## @param externalRedis.hostKey Key in existingSecret for Redis host. If set with existingSecret, REDIS_HOST will use this secret key. Otherwise uses 'host' value.
+  hostKey: ""
+  ## @param externalRedis.portKey Key in existingSecret for Redis port. If set with existingSecret, REDIS_PORT will use this secret key. Otherwise uses 'port' value.
+  portKey: ""
+  ## @param externalRedis.usernameKey Key in existingSecret for Redis username. If set with existingSecret, REDIS_USERNAME will use this secret key. Otherwise uses 'username' value.
+  usernameKey: ""
+  ## @param externalRedis.passwordKey Key in existingSecret for Redis password. If set with existingSecret, REDIS_PASSWORD will use this secret key. Otherwise uses 'password' value.
+  passwordKey: ""
+
+## @section Storage Configuration
+
+storage:
+  ## @param storage.bucket S3 bucket name for files (mapped to AWS_BUCKET_NAME)
+  bucket: ""
+  ## @param storage.privateBucket S3 bucket name for private uploads (mapped to AWS_PRIVATE_UPLOAD_BUCKET_NAME)
+  privateBucket: ""
+  ## @param storage.otelBucket S3 bucket name for OpenTelemetry data
+  otelBucket: ""

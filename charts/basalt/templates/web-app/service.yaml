@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "basalt.web-app.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: web-app
+  {{- if or .Values.webApp.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.webApp.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.webApp.service.type }}
+  {{- if and .Values.webApp.service.clusterIP (eq .Values.webApp.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.webApp.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.webApp.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.webApp.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.webApp.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.webApp.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.webApp.service.type "LoadBalancer") (eq .Values.webApp.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.webApp.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.webApp.service.type "LoadBalancer") (not (empty .Values.webApp.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.webApp.service.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.webApp.service.type "LoadBalancer") (not (empty .Values.webApp.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.webApp.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ .Values.webApp.service.ports.http }}
+      {{- if not (eq .Values.webApp.service.ports.http .Values.webApp.containerPorts.http) }}
+      targetPort: {{ .Values.webApp.containerPorts.http }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.webApp.service.type "NodePort") (eq .Values.webApp.service.type "LoadBalancer")) (not (empty .Values.webApp.service.nodePorts.http)) }}
+      nodePort: {{ .Values.webApp.service.nodePorts.http }}
+      {{- else if eq .Values.webApp.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.webApp.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.webApp.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.webApp.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: web-app

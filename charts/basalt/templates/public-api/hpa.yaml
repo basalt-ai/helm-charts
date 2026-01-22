@@ -1,0 +1,36 @@
+{{- if .Values.publicApi.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "basalt.public-api.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: public-api
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    kind: Deployment
+    name: {{ include "basalt.public-api.fullname" . }}
+  minReplicas: {{ .Values.publicApi.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.publicApi.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.publicApi.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.publicApi.autoscaling.hpa.targetMemory }}
+    {{- end }}
+    {{- if .Values.publicApi.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.publicApi.autoscaling.hpa.targetCPU }}
+    {{- end }}
+{{- end }}

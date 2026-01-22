@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "basalt.otel-collector.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  config.yaml: |
+    exporters:
+      awss3/traces:
+        marshaler: otlp_json
+        resource_attrs_to_s3:
+          s3_prefix: workspace.id
+        s3uploader:
+          region: eu-west-3
+          s3_base_prefix: data
+          s3_bucket: ${AWS_OTEL_BUCKET_NAME}
+          s3_partition_format: year=%Y/month=%m/day=%d/hour=%H
+          s3_prefix: unknown-workspace
+        sending_queue:
+          enabled: true
+          num_consumers: 10
+          queue_size: 1000
+        timeout: 30s
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+      myauth:
+        cache:
+          enabled: true
+          redis_addr: ${REDIS_HOST}:${REDIS_PORT}
+          redis_db: ${REDIS_DB}
+          redis_username: ${REDIS_USERNAME}
+          redis_password: ${REDIS_PASSWORD}
+          ttl: 5m
+        timeout: 5s
+        validation_url: http://{{ template "basalt.public-api.fullname" . }}:{{ .Values.publicApi.service.ports.http }}/auth/verify
+    processors:
+      batch:
+        send_batch_max_size: 512
+        send_batch_size: 256
+        timeout: 5s
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 1400
+        spike_limit_mib: 350
+      workspace: {}
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            auth:
+              authenticator: myauth
+            endpoint: 0.0.0.0:4317
+          http:
+            auth:
+              authenticator: myauth
+            endpoint: 0.0.0.0:4318
+    service:
+      extensions:
+        - myauth
+        - health_check
+      pipelines:
+        traces:
+          exporters:
+            - awss3/traces
+          processors:
+            - memory_limiter
+            - workspace
+            - batch
+          receivers:
+            - otlp
+

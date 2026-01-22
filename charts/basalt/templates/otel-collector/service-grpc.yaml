@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "basalt.otel-collector.fullname" . }}-grpc
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+  {{- if or .Values.otelCollector.serviceGrpc.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.otelCollector.serviceGrpc.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.otelCollector.serviceGrpc.type }}
+  {{- if and .Values.otelCollector.serviceGrpc.clusterIP (eq .Values.otelCollector.serviceGrpc.type "ClusterIP") }}
+  clusterIP: {{ .Values.otelCollector.serviceGrpc.clusterIP }}
+  {{- end }}
+  {{- if .Values.otelCollector.serviceGrpc.sessionAffinity }}
+  sessionAffinity: {{ .Values.otelCollector.serviceGrpc.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.otelCollector.serviceGrpc.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.otelCollector.serviceGrpc.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.otelCollector.serviceGrpc.type "LoadBalancer") (eq .Values.otelCollector.serviceGrpc.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.otelCollector.serviceGrpc.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.otelCollector.serviceGrpc.type "LoadBalancer") (not (empty .Values.otelCollector.serviceGrpc.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.otelCollector.serviceGrpc.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.otelCollector.serviceGrpc.type "LoadBalancer") (not (empty .Values.otelCollector.serviceGrpc.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.otelCollector.serviceGrpc.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: grpc
+      port: {{ .Values.otelCollector.serviceGrpc.ports.grpc }}
+      {{- if not (eq .Values.otelCollector.serviceGrpc.ports.grpc .Values.otelCollector.containerPorts.grpc) }}
+      targetPort: {{ .Values.otelCollector.containerPorts.grpc }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.otelCollector.serviceGrpc.type "NodePort") (eq .Values.otelCollector.serviceGrpc.type "LoadBalancer")) (not (empty .Values.otelCollector.serviceGrpc.nodePorts.grpc)) }}
+      nodePort: {{ .Values.otelCollector.serviceGrpc.nodePorts.grpc }}
+      {{- else if eq .Values.otelCollector.serviceGrpc.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.otelCollector.serviceGrpc.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.otelCollector.serviceGrpc.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.otelCollector.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
