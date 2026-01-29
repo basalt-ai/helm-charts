@@ -87,7 +87,7 @@ api:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/api
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -676,7 +676,7 @@ publicApi:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/public-api
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -1265,7 +1265,7 @@ otelCollector:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/otel-collector
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -2010,7 +2010,7 @@ webApp:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/web-app
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -2596,7 +2596,7 @@ jobsRunner:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/jobs-runner
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -3011,7 +3011,7 @@ otelSqsProcessor:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/otel-sqs-processor
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -3376,7 +3376,7 @@ migration:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/db-migrations
-    tag: v3.10.8
+    tag: v3.10.9
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
