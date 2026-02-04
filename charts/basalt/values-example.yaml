@@ -99,6 +99,7 @@ externalPostgres:
   databaseKey: dbname
   userKey: user
   passwordKey: password
+  sslmode: require
 
 externalClickhouse:
   url: http://clickhouse:8123

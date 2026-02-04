@@ -3610,9 +3610,11 @@ externalPostgres:
   user: ""
   ## @param externalPostgres.password PostgreSQL password (used as direct value if passwordKey is not set)
   password: ""
+  ## @param externalPostgres.sslmode PostgreSQL SSL mode (used as direct value if sslmodeKey is not set). Possible values: disable, allow, prefer, require, verify-ca, verify-full
+  sslmode: "prefer"
   ## @param externalPostgres.existingSecret Name of existing secret containing PostgreSQL credentials (optional)
   ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
-  ## Otherwise, the direct value (host, port, user, password, database) will be used.
+  ## Otherwise, the direct value (host, port, user, password, database, sslmode) will be used.
   ## This allows you to mix secret-based and direct values.
   existingSecret: ""
   ## @param externalPostgres.hostKey Key in existingSecret for PostgreSQL host. If set with existingSecret, DB_HOST and DB_HOST_REPLICA will use this secret key. Otherwise uses 'host' value.
@@ -3625,6 +3627,8 @@ externalPostgres:
   userKey: ""
   ## @param externalPostgres.passwordKey Key in existingSecret for PostgreSQL password. If set with existingSecret, DB_PASSWORD will use this secret key. Otherwise uses 'password' value.
   passwordKey: ""
+  ## @param externalPostgres.sslmodeKey Key in existingSecret for PostgreSQL SSL mode. If set with existingSecret, PGSSLMODE will use this secret key. Otherwise uses 'sslmode' value.
+  sslmodeKey: ""
 
 externalClickhouse:
   ## @param externalClickhouse.url Clickhouse URL (used as direct value if urlKey is not set)

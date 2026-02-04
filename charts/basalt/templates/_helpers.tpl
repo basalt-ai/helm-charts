@@ -263,6 +263,8 @@ Redis environment variables (scheme, host, port, username, password)
 Common environment variables for Basalt services
 */}}
 {{- define "basalt.commonEnvVars" -}}
+- name: NODE_ENV
+  value: production
 - name: AWS_REGION
   value: {{ .Values.config.region | quote }}
 - name: EVALUATOR_SCRIPT_FUNCTION_NAME
@@ -326,6 +328,16 @@ Common environment variables for Basalt services
 {{- else }}
 - name: DB_NAME
   value: {{ .Values.externalPostgres.database | quote }}
+{{- end }}
+{{- if and .Values.externalPostgres.existingSecret .Values.externalPostgres.sslmodeKey }}
+- name: PGSSLMODE
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalPostgres.existingSecret }}
+      key: {{ .Values.externalPostgres.sslmodeKey }}
+{{- else }}
+- name: PGSSLMODE
+  value: {{ .Values.externalPostgres.sslmode | quote }}
 {{- end }}
 - name: API_HOST
   value: {{ .Values.config.apiUrl | quote }}
