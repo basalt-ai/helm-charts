@@ -319,3 +319,24 @@ module "otel_pod_identity" {
     }
   }
 }
+
+module "otel_collector_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "2.7.0"
+
+  name = "pod-identity-basalt-otel-collector"
+  additional_policy_arns = {
+    custom = aws_iam_policy.otel_collector.arn
+  }
+
+  association_defaults = {
+    namespace       = "basalt"
+    service_account = "basalt-otel-collector"
+  }
+
+  associations = {
+    eks = {
+      cluster_name = local.cluster_name
+    }
+  }
+}
