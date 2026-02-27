@@ -87,7 +87,7 @@ api:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/api
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -108,6 +108,7 @@ api:
   ##
   containerPorts:
     http: 3000
+    metrics: 9090
   ## @param api.extraContainerPorts Optionally specify extra list of additional ports for api containers
   ## e.g:
   ## extraContainerPorts:
@@ -126,7 +127,7 @@ api:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -140,7 +141,7 @@ api:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -154,7 +155,7 @@ api:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -424,6 +425,7 @@ api:
     ##
     ports:
       http: 3000
+      metrics: 9090
     ## Node ports to expose
     ## @param service.nodePorts.http Node port for HTTP
     ## @param service.nodePorts.https Node port for HTTPS
@@ -431,6 +433,7 @@ api:
     ##
     nodePorts:
       http: ""
+      metrics: ""
     ## @param service.clusterIP api service Cluster IP
     ## e.g.:
     ## clusterIP: None
@@ -658,6 +661,61 @@ api:
     ##
     automountServiceAccountToken: true
 
+  ## Prometheus metrics
+  ##
+  metrics:
+    ## @param metrics.enabled Enable the export of Prometheus metrics
+    ##
+    enabled: false
+    ## Prometheus Operator ServiceMonitor configuration
+    ##
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`)
+      ##
+      enabled: false
+      ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
+      ##
+      namespace: ""
+      ## @param metrics.serviceMonitor.annotations Additional custom annotations for the ServiceMonitor
+      ##
+      annotations: {}
+      ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
+      ##
+      labels: {}
+      ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
+      ##
+      jobLabel: ""
+      ## @param metrics.serviceMonitor.honorLabels honorLabels chooses the metric's labels on collisions with target labels
+      ##
+      honorLabels: false
+      ## @param metrics.serviceMonitor.tlsConfig [object] TLS configuration used for scrape endpoints used by Prometheus
+      ##
+      tlsConfig: {}
+      ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped.
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## interval: 10s
+      ##
+      interval: ""
+      ## @param metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## scrapeTimeout: 10s
+      ##
+      scrapeTimeout: ""
+      ## @param metrics.serviceMonitor.metricRelabelings Specify additional relabeling of metrics
+      ##
+      metricRelabelings: []
+      ## @param metrics.serviceMonitor.relabelings Specify general relabeling
+      ##
+      relabelings: []
+      ## @param metrics.serviceMonitor.selector Prometheus instance selector labels
+      ## ref: https://github.com/bitnami/charts/tree/main/bitnami/prometheus-operator#prometheus-configuration
+      ## selector:
+      ##   prometheus: my-prometheus
+      ##
+      selector: {}
+
 ## @section publicApi Parameters
 ##
 
@@ -676,7 +734,7 @@ publicApi:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/public-api
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -697,6 +755,7 @@ publicApi:
   ##
   containerPorts:
     http: 3000
+    metrics: 9090
   ## @param publicApi.extraContainerPorts Optionally specify extra list of additional ports for publicApi containers
   ## e.g:
   ## extraContainerPorts:
@@ -715,7 +774,7 @@ publicApi:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -729,7 +788,7 @@ publicApi:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -743,7 +802,7 @@ publicApi:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -1013,6 +1072,7 @@ publicApi:
     ##
     ports:
       http: 3000
+      metrics: 9090
     ## Node ports to expose
     ## @param service.nodePorts.http Node port for HTTP
     ## @param service.nodePorts.https Node port for HTTPS
@@ -1020,6 +1080,7 @@ publicApi:
     ##
     nodePorts:
       http: ""
+      metrics: ""
     ## @param service.clusterIP publicApi service Cluster IP
     ## e.g.:
     ## clusterIP: None
@@ -1247,6 +1308,61 @@ publicApi:
     ##
     automountServiceAccountToken: true
 
+  ## Prometheus metrics
+  ##
+  metrics:
+    ## @param metrics.enabled Enable the export of Prometheus metrics
+    ##
+    enabled: false
+    ## Prometheus Operator ServiceMonitor configuration
+    ##
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`)
+      ##
+      enabled: false
+      ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
+      ##
+      namespace: ""
+      ## @param metrics.serviceMonitor.annotations Additional custom annotations for the ServiceMonitor
+      ##
+      annotations: {}
+      ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
+      ##
+      labels: {}
+      ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
+      ##
+      jobLabel: ""
+      ## @param metrics.serviceMonitor.honorLabels honorLabels chooses the metric's labels on collisions with target labels
+      ##
+      honorLabels: false
+      ## @param metrics.serviceMonitor.tlsConfig [object] TLS configuration used for scrape endpoints used by Prometheus
+      ##
+      tlsConfig: {}
+      ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped.
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## interval: 10s
+      ##
+      interval: ""
+      ## @param metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## scrapeTimeout: 10s
+      ##
+      scrapeTimeout: ""
+      ## @param metrics.serviceMonitor.metricRelabelings Specify additional relabeling of metrics
+      ##
+      metricRelabelings: []
+      ## @param metrics.serviceMonitor.relabelings Specify general relabeling
+      ##
+      relabelings: []
+      ## @param metrics.serviceMonitor.selector Prometheus instance selector labels
+      ## ref: https://github.com/bitnami/charts/tree/main/bitnami/prometheus-operator#prometheus-configuration
+      ## selector:
+      ##   prometheus: my-prometheus
+      ##
+      selector: {}
+
 ## @section otelCollector Parameters
 ##
 
@@ -1265,7 +1381,7 @@ otelCollector:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/otel-collector
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -1306,7 +1422,7 @@ otelCollector:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -1320,7 +1436,7 @@ otelCollector:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -1334,7 +1450,7 @@ otelCollector:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2010,7 +2126,7 @@ webApp:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/web-app
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -2049,7 +2165,7 @@ webApp:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2063,7 +2179,7 @@ webApp:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2077,7 +2193,7 @@ webApp:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2596,7 +2712,7 @@ jobsRunner:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/jobs-runner
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -2613,6 +2729,10 @@ jobsRunner:
   ## @param jobsRunner.replicaCount Number of jobsRunner replicas to deploy
   ##
   replicaCount: 1
+  ## @param jobsRunner.containerPorts.metrics jobsRunner metrics container port
+  ##
+  containerPorts:
+    metrics: 9090
   ## Configure extra options for jobsRunner containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param jobsRunner.livenessProbe.enabled Enable livenessProbe on jobsRunner containers
@@ -2624,7 +2744,7 @@ jobsRunner:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2638,7 +2758,7 @@ jobsRunner:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2652,7 +2772,7 @@ jobsRunner:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 20
+    initialDelaySeconds: 60
     periodSeconds: 1
     timeoutSeconds: 30
     failureThreshold: 3
@@ -2910,6 +3030,34 @@ jobsRunner:
 
   ## @section Traffic Exposure Parameters
   ##
+
+  ## jobsRunner service parameters
+  ##
+  service:
+    ## @param service.type jobsRunner service type
+    ##
+    type: ClusterIP
+    ## @param service.ports.metrics jobsRunner service metrics port
+    ##
+    ports:
+      metrics: 9090
+    ## Node ports to expose
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      metrics: ""
+    ## @param service.clusterIP jobsRunner service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param service.annotations Additional custom annotations for jobsRunner service
+    ##
+    annotations: {}
+    ## @param service.extraPorts Extra ports to expose in jobsRunner service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+
   ## Network Policies
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
   ##
@@ -2996,6 +3144,61 @@ jobsRunner:
     ##
     automountServiceAccountToken: true
 
+  ## Prometheus metrics
+  ##
+  metrics:
+    ## @param metrics.enabled Enable the export of Prometheus metrics
+    ##
+    enabled: false
+    ## Prometheus Operator ServiceMonitor configuration
+    ##
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled if `true`, creates a Prometheus Operator ServiceMonitor (also requires `metrics.enabled` to be `true`)
+      ##
+      enabled: false
+      ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
+      ##
+      namespace: ""
+      ## @param metrics.serviceMonitor.annotations Additional custom annotations for the ServiceMonitor
+      ##
+      annotations: {}
+      ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
+      ##
+      labels: {}
+      ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in Prometheus
+      ##
+      jobLabel: ""
+      ## @param metrics.serviceMonitor.honorLabels honorLabels chooses the metric's labels on collisions with target labels
+      ##
+      honorLabels: false
+      ## @param metrics.serviceMonitor.tlsConfig [object] TLS configuration used for scrape endpoints used by Prometheus
+      ##
+      tlsConfig: {}
+      ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped.
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## interval: 10s
+      ##
+      interval: ""
+      ## @param metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
+      ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ## e.g:
+      ## scrapeTimeout: 10s
+      ##
+      scrapeTimeout: ""
+      ## @param metrics.serviceMonitor.metricRelabelings Specify additional relabeling of metrics
+      ##
+      metricRelabelings: []
+      ## @param metrics.serviceMonitor.relabelings Specify general relabeling
+      ##
+      relabelings: []
+      ## @param metrics.serviceMonitor.selector Prometheus instance selector labels
+      ## ref: https://github.com/bitnami/charts/tree/main/bitnami/prometheus-operator#prometheus-configuration
+      ## selector:
+      ##   prometheus: my-prometheus
+      ##
+      selector: {}
+
 ## otelSqsProcessor container/pod description
 ##
 otelSqsProcessor:
@@ -3011,7 +3214,7 @@ otelSqsProcessor:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/otel-sqs-processor
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -3376,7 +3579,7 @@ migration:
   image:
     registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
     repository: distrib/db-migrations
-    tag: v3.10.9
+    tag: v3.11.12
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -3555,6 +3758,595 @@ migration:
     ingressNSMatchLabels: {}
     ingressNSPodMatchLabels: {}
 
+## scriptEvaluator container/pod description
+##
+scriptEvaluator:
+  ## @param scriptEvaluator.enabled Enable script-evaluator deployment
+  ##
+  enabled: false
+  ## Basalt scriptEvaluator image
+  ## @param scriptEvaluator.image.registry [default: REGISTRY_NAME] scriptEvaluator image registry
+  ## @param scriptEvaluator.image.repository [default: REPOSITORY_NAME/%%IMAGE_NAME%%] scriptEvaluator image repository
+  ## @skip scriptEvaluator.image.tag scriptEvaluator image tag (immutable tags are recommended)
+  ## @param scriptEvaluator.image.digest scriptEvaluator image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param scriptEvaluator.image.pullPolicy scriptEvaluator image pull policy
+  ## @param scriptEvaluator.image.pullSecrets scriptEvaluator image pull secrets
+  ## @param scriptEvaluator.image.debug Enable scriptEvaluator image debug mode
+  ##
+  image:
+    registry: 014498634773.dkr.ecr.eu-west-3.amazonaws.com
+    repository: distrib/script-evaluator
+    tag: v3.11.12
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets (secrets must be manually created in the namespace)
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    debug: false
+  ## @param scriptEvaluator.replicaCount Number of scriptEvaluator replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param scriptEvaluator.containerPorts.http scriptEvaluator HTTP container port
+  ##
+  containerPorts:
+    http: 8000
+  ## @param scriptEvaluator.extraContainerPorts Optionally specify extra list of additional ports for scriptEvaluator containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## Configure extra options for scriptEvaluator containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param scriptEvaluator.livenessProbe.enabled Enable livenessProbe on scriptEvaluator containers
+  ## @param scriptEvaluator.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param scriptEvaluator.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param scriptEvaluator.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param scriptEvaluator.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param scriptEvaluator.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param scriptEvaluator.readinessProbe.enabled Enable readinessProbe on scriptEvaluator containers
+  ## @param scriptEvaluator.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param scriptEvaluator.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param scriptEvaluator.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param scriptEvaluator.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param scriptEvaluator.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param scriptEvaluator.startupProbe.enabled Enable startupProbe on scriptEvaluator containers
+  ## @param scriptEvaluator.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param scriptEvaluator.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param scriptEvaluator.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param scriptEvaluator.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param scriptEvaluator.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 1
+    timeoutSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param scriptEvaluator.customLivenessProbe Custom livenessProbe that overrides the default one
+  ##
+  customLivenessProbe: {}
+  ## @param scriptEvaluator.customReadinessProbe Custom readinessProbe that overrides the default one
+  ##
+  customReadinessProbe: {}
+  ## @param scriptEvaluator.customStartupProbe Custom startupProbe that overrides the default one
+  ##
+  customStartupProbe: {}
+  ## @param scriptEvaluator.resources Set scriptEvaluator container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param scriptEvaluator.podSecurityContext.enabled Enable scriptEvaluator pods' Security Context
+  ## @param scriptEvaluator.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for scriptEvaluator pods
+  ## @param scriptEvaluator.podSecurityContext.sysctls Set kernel settings using the sysctl interface for scriptEvaluator pods
+  ## @param scriptEvaluator.podSecurityContext.supplementalGroups Set filesystem extra groups for scriptEvaluator pods
+  ## @param scriptEvaluator.podSecurityContext.fsGroup Set fsGroup in scriptEvaluator pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param scriptEvaluator.containerSecurityContext.enabled Enabled scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in scriptEvaluator container
+  ## @param scriptEvaluator.containerSecurityContext.runAsUser Set runAsUser in scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.runAsGroup Set runAsGroup in scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.runAsNonRoot Set runAsNonRoot in scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.readOnlyRootFilesystem Set readOnlyRootFilesystem in scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.privileged Set privileged in scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.allowPrivilegeEscalation Set allowPrivilegeEscalation in scriptEvaluator container' Security Context
+  ## @param scriptEvaluator.containerSecurityContext.capabilities.drop List of capabilities to be dropped in scriptEvaluator container
+  ## @param scriptEvaluator.containerSecurityContext.seccompProfile.type Set seccomp profile in scriptEvaluator container
+  ##
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param scriptEvaluator.existingConfigmap The name of an existing ConfigMap with your custom configuration for scriptEvaluator
+  ##
+  existingConfigmap: ""
+  ## @param scriptEvaluator.command Override default scriptEvaluator container command (useful when using custom images)
+  ##
+  command: []
+  ## @param scriptEvaluator.args Override default scriptEvaluator container args (useful when using custom images)
+  ##
+  args: []
+  ## @param scriptEvaluator.automountServiceAccountToken Mount Service Account token in scriptEvaluator pods
+  ##
+  automountServiceAccountToken: false
+  ## @param scriptEvaluator.hostAliases scriptEvaluator pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param scriptEvaluator.deploymentAnnotations Annotations for scriptEvaluator deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## @param scriptEvaluator.podLabels Extra labels for scriptEvaluator pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param scriptEvaluator.podAnnotations Annotations for scriptEvaluator pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## @param scriptEvaluator.podAffinityPreset Pod affinity preset. Ignored if `scriptEvaluator.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAffinityPreset: ""
+  ## @param scriptEvaluator.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `scriptEvaluator.affinity` is set. Allowed values: `soft` or `hard`
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ##
+  podAntiAffinityPreset: soft
+  ## Node scriptEvaluator.affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ##
+  nodeAffinityPreset:
+    ## @param scriptEvaluator.nodeAffinityPreset.type Node affinity preset type. Ignored if `scriptEvaluator.affinity` is set. Allowed values: `soft` or `hard`
+    ##
+    type: ""
+    ## @param scriptEvaluator.nodeAffinityPreset.key Node label key to match. Ignored if `scriptEvaluator.affinity` is set
+    ##
+    key: ""
+    ## @param scriptEvaluator.nodeAffinityPreset.values Node label values to match. Ignored if `scriptEvaluator.affinity` is set
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+  ## @param scriptEvaluator.affinity Affinity for scriptEvaluator pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## NOTE: `scriptEvaluator.podAffinityPreset`, `scriptEvaluator.podAntiAffinityPreset`, and `scriptEvaluator.nodeAffinityPreset` will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param scriptEvaluator.nodeSelector Node labels for scriptEvaluator pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  ##
+  nodeSelector: {}
+  ## @param scriptEvaluator.tolerations Tolerations for scriptEvaluator pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## ONLY FOR DEPLOYMENTS:
+  ## @param scriptEvaluator.updateStrategy.type scriptEvaluator deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## ONLY FOR STATEFULSETS:
+  ## @param scriptEvaluator.updateStrategy.type scriptEvaluator statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    ## ONLY FOR DEPLOYMENTS:
+    ## Can be set to RollingUpdate or Recreate
+    ## ONLY FOR STATEFULSETS:
+    ## Can be set to RollingUpdate or OnDelete
+    ##
+    type: RollingUpdate
+  ## ONLY FOR STATEFULSETS:
+  ## @param scriptEvaluator.podManagementPolicy Pod management policy for scriptEvaluator statefulset
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  ##
+  podManagementPolicy: OrderedReady
+  ## @param scriptEvaluator.priorityClassName scriptEvaluator pods' priorityClassName
+  ##
+  priorityClassName: ""
+  ## @param scriptEvaluator.topologySpreadConstraints Topology Spread Constraints for scriptEvaluator pod assignment spread across your cluster among failure-domains
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods
+  ##
+  topologySpreadConstraints: []
+  ## @param scriptEvaluator.schedulerName Name of the k8s scheduler (other than default) for scriptEvaluator pods
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param scriptEvaluator.terminationGracePeriodSeconds Seconds scriptEvaluator pods need to terminate gracefully
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods
+  ##
+  terminationGracePeriodSeconds: ""
+  ## @param scriptEvaluator.lifecycleHooks for scriptEvaluator containers to automate configuration before or after startup
+  ##
+  lifecycleHooks: {}
+  ## @param scriptEvaluator.extraEnvVars Array with extra environment variables to add to scriptEvaluator containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param scriptEvaluator.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for scriptEvaluator containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param scriptEvaluator.extraEnvVarsSecret Name of existing Secret containing extra env vars for scriptEvaluator containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param scriptEvaluator.extraVolumes Optionally specify extra list of additional volumes for the scriptEvaluator pods
+  ##
+  extraVolumes: []
+  ## @param scriptEvaluator.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the scriptEvaluator containers
+  ##
+  extraVolumeMounts: []
+  ## @param scriptEvaluator.sidecars Add additional sidecar containers to the scriptEvaluator pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param scriptEvaluator.initContainers Add additional init containers to the scriptEvaluator pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param scriptEvaluator.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param scriptEvaluator.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param scriptEvaluator.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `scriptEvaluator.pdb.minAvailable` and `scriptEvaluator.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param scriptEvaluator.autoscaling.vpa.enabled Enable VPA for scriptEvaluator pods
+    ## @param scriptEvaluator.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param scriptEvaluator.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param scriptEvaluator.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param scriptEvaluator.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param scriptEvaluator.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+    ## @param scriptEvaluator.autoscaling.hpa.enabled Enable HPA for scriptEvaluator pods
+    ## @param scriptEvaluator.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param scriptEvaluator.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param scriptEvaluator.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param scriptEvaluator.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+
+  ## @section Traffic Exposure Parameters
+  ##
+
+  ## scriptEvaluator service parameters
+  ##
+  service:
+    ## @param service.type scriptEvaluator service type
+    ##
+    type: ClusterIP
+    ## @param service.ports.http scriptEvaluator service HTTP port
+    ## @param service.ports.https scriptEvaluator service HTTPS port
+    ##
+    ports:
+      http: 8000
+    ## Node ports to expose
+    ## @param service.nodePorts.http Node port for HTTP
+    ## @param service.nodePorts.https Node port for HTTPS
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+    ## @param service.clusterIP scriptEvaluator service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param service.loadBalancerIP scriptEvaluator service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param service.loadBalancerSourceRanges scriptEvaluator service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.externalTrafficPolicy scriptEvaluator service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param service.annotations Additional custom annotations for scriptEvaluator service
+    ##
+    annotations: {}
+    ## @param service.extraPorts Extra ports to expose in scriptEvaluator service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## server label will have network access to the ports server is listening
+    ## on. When true, server will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+  ## scriptEvaluator ingress parameters
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    ## @param ingress.enabled Enable ingress record generation for scriptEvaluator
+    ##
+    enabled: false
+    ## @param ingress.pathType Ingress path type
+    ##
+    pathType: ImplementationSpecific
+    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param ingress.hostname Default host for the ingress record
+    ##
+    hostname: basalt.local
+    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param ingress.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## You can:
+    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##
+    tls: false
+    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: %%COMPONENT_NAME%%.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - %%COMPONENT_NAME%%.local
+    ##   secretName: %%COMPONENT_NAME%%.local-tls
+    ##
+    extraTls: []
+    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: %%COMPONENT_NAME%%.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+
+  ## @section Other Parameters
+  ##
+
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ##
+    automountServiceAccountToken: true
+
 config:
   ## @param config.apiUrl API base URL (mapped to API_HOST environment variable)
   apiUrl: ""
@@ -3565,6 +4357,7 @@ config:
   ## @param config.region AWS region (S3, SQS and Lambda)
   region: ""
   ## @param config.lambdaScriptEvaluatorName Lambda function name for script evaluator (mapped to EVALUATOR_SCRIPT_FUNCTION_NAME environment variable)
+  ## @deprecated config.lambdaScriptEvaluatorName -- This parameter is deprecated and will be removed in version 2.0.0. Set scriptEvaluator.enabled to true instead.
   lambdaScriptEvaluatorName: ""
   ## @param config.sessionSecretExistingSecret Name of existing secret containing session secret (optional)
   ## If existingSecret AND sessionSecretKey are set, the value will be read from the secret.
@@ -3585,7 +4378,8 @@ config:
     ## Google OAuth configuration
     google:
       ## @param config.auth.google.enabled Enable Google OAuth authentication
-      enabled: false
+      ## NOTE: In 2.x, this parameter will default to false. Set it explicitly if you rely on Google OAuth.
+      enabled: true
       ## @param config.auth.google.clientId Google OAuth client ID (used as direct value if clientIdKey is not set)
       clientId: ""
       ## @param config.auth.google.clientSecret Google OAuth client secret (used as direct value if clientSecretKey is not set)
@@ -3598,6 +4392,47 @@ config:
       clientIdKey: ""
       ## @param config.auth.google.clientSecretKey Key in existingSecret for Google OAuth client secret. If set with existingSecret, GOOGLE_CLIENT_SECRET will use this secret key. Otherwise uses 'clientSecret' value.
       clientSecretKey: ""
+    ## OneLogin OIDC configuration
+    oneLogin:
+      ## @param config.auth.oneLogin.enabled Enable OneLogin OIDC authentication
+      enabled: false
+      ## @param config.auth.oneLogin.clientId OneLogin client ID (used as direct value if clientIdKey is not set)
+      clientId: ""
+      ## @param config.auth.oneLogin.clientSecret OneLogin client secret (used as direct value if clientSecretKey is not set)
+      clientSecret: ""
+      ## @param config.auth.oneLogin.issuer OneLogin issuer URL (used as direct value if issuerKey is not set)
+      issuer: ""
+      ## @param config.auth.oneLogin.existingSecret Name of existing secret containing OneLogin credentials (optional)
+      ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
+      ## Otherwise, the direct value (clientId, clientSecret, issuer) will be used.
+      existingSecret: ""
+      ## @param config.auth.oneLogin.clientIdKey Key in existingSecret for OneLogin client ID
+      clientIdKey: ""
+      ## @param config.auth.oneLogin.clientSecretKey Key in existingSecret for OneLogin client secret
+      clientSecretKey: ""
+      ## @param config.auth.oneLogin.issuerKey Key in existingSecret for OneLogin issuer URL
+      issuerKey: ""
+      ## @param config.auth.oneLogin.defaultLoginWorkspaceId Default workspace ID for OneLogin users
+      defaultLoginWorkspaceId: ""
+      ## Role mappings
+      roles:
+        ## @param config.auth.oneLogin.roles.admin OneLogin group name mapped to admin role
+        admin: ""
+        ## @param config.auth.oneLogin.roles.engineer OneLogin group name mapped to engineer role
+        engineer: ""
+        ## @param config.auth.oneLogin.roles.builder OneLogin group name mapped to builder role
+        builder: ""
+        ## @param config.auth.oneLogin.roles.viewer OneLogin group name mapped to viewer role
+        viewer: ""
+      ## @param config.auth.oneLogin.defaultRole Default role for OneLogin users (admin, engineer, builder, viewer)
+      defaultRole: "viewer"
+    ## @param config.auth.signupEnabled Enable user signup
+    signupEnabled: true
+    ## Email/password authentication configuration
+    email:
+      ## @param config.auth.email.enabled Enable email/password authentication
+      ## NOTE: In 2.x, this parameter will default to false. Set it explicitly if you rely on email/password authentication.
+      enabled: true
 
 externalPostgres:
   ## @param externalPostgres.host PostgreSQL host (used as direct value if hostKey is not set)
@@ -3610,11 +4445,9 @@ externalPostgres:
   user: ""
   ## @param externalPostgres.password PostgreSQL password (used as direct value if passwordKey is not set)
   password: ""
-  ## @param externalPostgres.sslmode PostgreSQL SSL mode (used as direct value if sslmodeKey is not set). Possible values: disable, allow, prefer, require, verify-ca, verify-full
-  sslmode: "prefer"
   ## @param externalPostgres.existingSecret Name of existing secret containing PostgreSQL credentials (optional)
   ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
-  ## Otherwise, the direct value (host, port, user, password, database, sslmode) will be used.
+  ## Otherwise, the direct value (host, port, user, password, database) will be used.
   ## This allows you to mix secret-based and direct values.
   existingSecret: ""
   ## @param externalPostgres.hostKey Key in existingSecret for PostgreSQL host. If set with existingSecret, DB_HOST and DB_HOST_REPLICA will use this secret key. Otherwise uses 'host' value.
@@ -3627,8 +4460,6 @@ externalPostgres:
   userKey: ""
   ## @param externalPostgres.passwordKey Key in existingSecret for PostgreSQL password. If set with existingSecret, DB_PASSWORD will use this secret key. Otherwise uses 'password' value.
   passwordKey: ""
-  ## @param externalPostgres.sslmodeKey Key in existingSecret for PostgreSQL SSL mode. If set with existingSecret, PGSSLMODE will use this secret key. Otherwise uses 'sslmode' value.
-  sslmodeKey: ""
 
 externalClickhouse:
   ## @param externalClickhouse.url Clickhouse URL (used as direct value if urlKey is not set)

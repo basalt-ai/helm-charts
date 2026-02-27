@@ -41,6 +41,19 @@ spec:
       {{- else if eq .Values.publicApi.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
+    {{- if .Values.publicApi.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.publicApi.service.ports.metrics }}
+      {{- if not (eq .Values.publicApi.service.ports.metrics .Values.publicApi.containerPorts.metrics) }}
+      targetPort: {{ .Values.publicApi.containerPorts.metrics }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.publicApi.service.type "NodePort") (eq .Values.publicApi.service.type "LoadBalancer")) (not (empty .Values.publicApi.service.nodePorts.metrics)) }}
+      nodePort: {{ .Values.publicApi.service.nodePorts.metrics }}
+      {{- else if eq .Values.publicApi.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- end }}
     {{- if .Values.publicApi.service.extraPorts }}
     {{- include "common.tplvalues.render" (dict "value" .Values.publicApi.service.extraPorts "context" $) | nindent 4 }}
     {{- end }}

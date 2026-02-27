@@ -34,6 +34,9 @@ spec:
   ingress:
     - ports:
         - port: {{ .Values.publicApi.containerPorts.http }}
+        {{- if .Values.publicApi.metrics.enabled }}
+        - port: {{ .Values.publicApi.containerPorts.metrics }}
+        {{- end }}
         {{- range .Values.publicApi.extraContainerPorts }}
         - port: {{ .containerPort }}
         {{- end }}

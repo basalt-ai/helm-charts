@@ -61,6 +61,10 @@ data:
               authenticator: myauth
             endpoint: 0.0.0.0:4318
     service:
+      telemetry:
+        logs:
+          level: WARN
+          encoding: json
       extensions:
         - myauth
         - health_check

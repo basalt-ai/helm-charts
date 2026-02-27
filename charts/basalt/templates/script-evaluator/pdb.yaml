@@ -1,0 +1,23 @@
+{{- if and .Values.scriptEvaluator.enabled .Values.scriptEvaluator.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "basalt.script-evaluator.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: script-evaluator
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.scriptEvaluator.pdb.minAvailable }}
+  minAvailable: {{ .Values.scriptEvaluator.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.scriptEvaluator.pdb.maxUnavailable ( not .Values.scriptEvaluator.pdb.minAvailable ) }}
+  maxUnavailable: {{ .Values.scriptEvaluator.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.scriptEvaluator.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: script-evaluator
+{{- end }}
