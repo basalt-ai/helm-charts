@@ -240,6 +240,8 @@ Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
 Redis environment variables (scheme, host, port, username, password)
 */}}
 {{- define "basalt.redisEnvVars" -}}
+- name: NODE_ENV
+  value: production
 {{- if and .Values.externalRedis.existingSecret .Values.externalRedis.schemeKey }}
 - name: REDIS_SCHEME
   valueFrom:
@@ -364,6 +366,16 @@ Common environment variables for Basalt services
 {{- else }}
 - name: DB_NAME
   value: {{ .Values.externalPostgres.database | quote }}
+{{- end }}
+{{- if and .Values.externalPostgres.existingSecret .Values.externalPostgres.sslmodeKey }}
+- name: PGSSLMODE
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalPostgres.existingSecret }}
+      key: {{ .Values.externalPostgres.sslmodeKey }}
+{{- else }}
+- name: PGSSLMODE
+  value: {{ .Values.externalPostgres.sslmode | quote }}
 {{- end }}
 - name: API_HOST
   value: {{ .Values.config.apiUrl | quote }}
@@ -544,9 +556,9 @@ Validate config values
 basalt: config.region
     config.region is required. Please set a value.
 {{- end -}}
-{{- if not .Values.config.lambdaScriptEvaluatorName -}}
+{{- if and (not .Values.scriptEvaluator.enabled) (not .Values.config.lambdaScriptEvaluatorName) -}}
 basalt: config.lambdaScriptEvaluatorName
-    config.lambdaScriptEvaluatorName is required. Please set a value.
+    config.lambdaScriptEvaluatorName is required when scriptEvaluator.enabled is false. Please set a value.
 {{- end -}}
 {{- if not .Values.config.apiUrl -}}
 basalt: config.apiUrl

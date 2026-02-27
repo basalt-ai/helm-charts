@@ -127,9 +127,9 @@ api:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
   ## @param api.readinessProbe.enabled Enable readinessProbe on api containers
@@ -141,9 +141,9 @@ api:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
   ## @param api.startupProbe.enabled Enable startupProbe on api containers
@@ -154,11 +154,11 @@ api:
   ## @param api.startupProbe.successThreshold Success threshold for startupProbe
   ##
   startupProbe:
-    enabled: false
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
-    failureThreshold: 3
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 60
+    failureThreshold: 30
     successThreshold: 1
   ## @param api.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -193,7 +193,7 @@ api:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param api.containerSecurityContext.enabled Enabled api container' Security Context
@@ -210,8 +210,8 @@ api:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 1000
+    runAsGroup: 1000
     runAsNonRoot: true
     readOnlyRootFilesystem: true
     privileged: false
@@ -774,9 +774,9 @@ publicApi:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
   ## @param publicApi.readinessProbe.enabled Enable readinessProbe on publicApi containers
@@ -788,9 +788,9 @@ publicApi:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
   ## @param publicApi.startupProbe.enabled Enable startupProbe on publicApi containers
@@ -801,11 +801,11 @@ publicApi:
   ## @param publicApi.startupProbe.successThreshold Success threshold for startupProbe
   ##
   startupProbe:
-    enabled: false
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
-    failureThreshold: 3
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 60
+    failureThreshold: 30
     successThreshold: 1
   ## @param publicApi.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -840,7 +840,7 @@ publicApi:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param publicApi.containerSecurityContext.enabled Enabled publicApi container' Security Context
@@ -857,8 +857,8 @@ publicApi:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 1000
+    runAsGroup: 1000
     runAsNonRoot: true
     readOnlyRootFilesystem: true
     privileged: false
@@ -2231,7 +2231,7 @@ webApp:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 101
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param webApp.containerSecurityContext.enabled Enabled webApp container' Security Context
@@ -2248,8 +2248,8 @@ webApp:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 101
+    runAsGroup: 101
     runAsNonRoot: true
     readOnlyRootFilesystem: true
     privileged: false
@@ -2744,9 +2744,9 @@ jobsRunner:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
   ## @param jobsRunner.readinessProbe.enabled Enable readinessProbe on jobsRunner containers
@@ -2758,9 +2758,9 @@ jobsRunner:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
   ## @param jobsRunner.startupProbe.enabled Enable startupProbe on jobsRunner containers
@@ -2771,11 +2771,11 @@ jobsRunner:
   ## @param jobsRunner.startupProbe.successThreshold Success threshold for startupProbe
   ##
   startupProbe:
-    enabled: false
-    initialDelaySeconds: 60
-    periodSeconds: 1
-    timeoutSeconds: 30
-    failureThreshold: 3
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 60
+    failureThreshold: 30
     successThreshold: 1
   ## @param jobsRunner.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -2810,7 +2810,7 @@ jobsRunner:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param jobsRunner.containerSecurityContext.enabled Enabled jobsRunner container' Security Context
@@ -2827,8 +2827,8 @@ jobsRunner:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 1000
+    runAsGroup: 1000
     runAsNonRoot: true
     readOnlyRootFilesystem: true
     privileged: false
@@ -3255,7 +3255,7 @@ otelSqsProcessor:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param otelSqsProcessor.containerSecurityContext.enabled Enabled otelSqsProcessor container' Security Context
@@ -3272,8 +3272,8 @@ otelSqsProcessor:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 1000
+    runAsGroup: 1000
     runAsNonRoot: true
     readOnlyRootFilesystem: true
     privileged: false
@@ -3636,7 +3636,7 @@ migration:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 1000
   ## @param migration.containerSecurityContext.enabled Enabled containers' Security Context
   ## @param migration.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in container
   ## @param migration.containerSecurityContext.runAsUser Set containers' Security Context runAsUser
@@ -3650,8 +3650,8 @@ migration:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 1000
+    runAsGroup: 1000
     runAsNonRoot: true
     privileged: false
     readOnlyRootFilesystem: true
@@ -3881,7 +3881,7 @@ scriptEvaluator:
     fsGroupChangePolicy: Always
     sysctls: []
     supplementalGroups: []
-    fsGroup: 1001
+    fsGroup: 65534
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param scriptEvaluator.containerSecurityContext.enabled Enabled scriptEvaluator container' Security Context
@@ -3898,8 +3898,8 @@ scriptEvaluator:
   containerSecurityContext:
     enabled: true
     seLinuxOptions: {}
-    runAsUser: 1001
-    runAsGroup: 1001
+    runAsUser: 65534
+    runAsGroup: 65534
     runAsNonRoot: true
     readOnlyRootFilesystem: true
     privileged: false
@@ -4445,9 +4445,11 @@ externalPostgres:
   user: ""
   ## @param externalPostgres.password PostgreSQL password (used as direct value if passwordKey is not set)
   password: ""
+  ## @param externalPostgres.sslmode PostgreSQL SSL mode (used as direct value if sslmodeKey is not set). Possible values: disable, allow, prefer, require, verify-ca, verify-full
+  sslmode: "prefer"
   ## @param externalPostgres.existingSecret Name of existing secret containing PostgreSQL credentials (optional)
   ## For each credential, if existingSecret AND the corresponding key are set, the value will be read from the secret.
-  ## Otherwise, the direct value (host, port, user, password, database) will be used.
+  ## Otherwise, the direct value (host, port, user, password, database, sslmode) will be used.
   ## This allows you to mix secret-based and direct values.
   existingSecret: ""
   ## @param externalPostgres.hostKey Key in existingSecret for PostgreSQL host. If set with existingSecret, DB_HOST and DB_HOST_REPLICA will use this secret key. Otherwise uses 'host' value.
@@ -4460,6 +4462,8 @@ externalPostgres:
   userKey: ""
   ## @param externalPostgres.passwordKey Key in existingSecret for PostgreSQL password. If set with existingSecret, DB_PASSWORD will use this secret key. Otherwise uses 'password' value.
   passwordKey: ""
+  ## @param externalPostgres.sslmodeKey Key in existingSecret for PostgreSQL SSL mode. If set with existingSecret, PGSSLMODE will use this secret key. Otherwise uses 'sslmode' value.
+  sslmodeKey: ""
 
 externalClickhouse:
   ## @param externalClickhouse.url Clickhouse URL (used as direct value if urlKey is not set)
