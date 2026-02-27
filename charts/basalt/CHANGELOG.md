@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1] - 2026-02-27
+
+### Fixed
+
+- Some parameters had been removed in 1.1.0, they are restored in 1.1.1
+- Aligned uid/gid with container users
+- Updated probe settings for the various deployments
+
 ## [1.1.0] - 2026-02-27
 
 ### Changed
