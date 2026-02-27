@@ -1,0 +1,46 @@
+{{- if and .Values.jobsRunner.metrics.enabled .Values.jobsRunner.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "basalt.jobs-runner.fullname" . }}
+  namespace: {{ default (include "common.names.namespace" .) .Values.jobsRunner.metrics.serviceMonitor.namespace | quote }}
+  {{- $labels := include "common.tplvalues.merge" (dict "values" (list .Values.jobsRunner.metrics.serviceMonitor.labels .Values.commonLabels) "context" .) }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: jobs-runner
+  {{- if or .Values.jobsRunner.metrics.serviceMonitor.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.jobsRunner.metrics.serviceMonitor.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  jobLabel: {{ .Values.jobsRunner.metrics.serviceMonitor.jobLabel | quote }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 6 }}
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.selector }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.jobsRunner.metrics.serviceMonitor.selector "context" $) | nindent 6 }}
+      {{- end }}
+  endpoints:
+    - port: metrics
+      path: "/metrics"
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.tlsConfig }}
+      scheme: https
+      tlsConfig: {{- include "common.tplvalues.render" ( dict "value" .Values.jobsRunner.metrics.serviceMonitor.tlsConfig "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.jobsRunner.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.jobsRunner.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.jobsRunner.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.jobsRunner.metrics.serviceMonitor.metricRelabelings "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobsRunner.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- include "common.tplvalues.render" ( dict "value" .Values.jobsRunner.metrics.serviceMonitor.relabelings "context" $) | nindent 8 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+    - {{ include "common.names.namespace" . | quote }}
+{{- end }}

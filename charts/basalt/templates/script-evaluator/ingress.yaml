@@ -1,0 +1,51 @@
+{{- if and .Values.scriptEvaluator.enabled .Values.scriptEvaluator.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ template "basalt.script-evaluator.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: script-evaluator
+  {{- if or .Values.scriptEvaluator.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.scriptEvaluator.ingress.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.scriptEvaluator.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.scriptEvaluator.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.scriptEvaluator.ingress.hostname }}
+    - host: {{ .Values.scriptEvaluator.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.scriptEvaluator.ingress.extraPaths }}
+          {{- toYaml .Values.scriptEvaluator.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.scriptEvaluator.ingress.path }}
+            pathType: {{ .Values.scriptEvaluator.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "basalt.script-evaluator.fullname" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.scriptEvaluator.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "basalt.script-evaluator.fullname" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.scriptEvaluator.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.scriptEvaluator.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.scriptEvaluator.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.scriptEvaluator.ingress.annotations )) .Values.scriptEvaluator.ingress.selfSigned)) .Values.scriptEvaluator.ingress.extraTls }}
+  tls:
+    {{- if and .Values.scriptEvaluator.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.scriptEvaluator.ingress.annotations )) .Values.scriptEvaluator.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.scriptEvaluator.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.scriptEvaluator.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.scriptEvaluator.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.scriptEvaluator.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

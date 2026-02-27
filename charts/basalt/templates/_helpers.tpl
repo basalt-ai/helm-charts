@@ -194,6 +194,39 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Return the proper Basalt Kubernetes API fullname
+*/}}
+{{- define "basalt.script-evaluator.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "script-evaluator" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Basalt Kubernetes API fullname (with namespace)
+(removing image- prefix to avoid name length issues)
+*/}}
+{{- define "basalt.script-evaluator.fullname.namespace" -}}
+{{- printf "%s-%s" (include "common.names.fullname.namespace" .) "script-evaluator" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper script-evaluator image name
+*/}}
+{{- define "basalt.script-evaluator.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.scriptEvaluator.image "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "basalt.script-evaluator.serviceAccountName" -}}
+{{- if .Values.scriptEvaluator.serviceAccount.create -}}
+    {{ default (include "basalt.script-evaluator.fullname" .) .Values.scriptEvaluator.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.scriptEvaluator.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Return true if cert-manager required annotations for TLS signed certificates are set in the Ingress annotations
 Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
 */}}
@@ -263,12 +296,15 @@ Redis environment variables (scheme, host, port, username, password)
 Common environment variables for Basalt services
 */}}
 {{- define "basalt.commonEnvVars" -}}
-- name: NODE_ENV
-  value: production
 - name: AWS_REGION
   value: {{ .Values.config.region | quote }}
+{{- if .Values.scriptEvaluator.enabled }}
+- name: SCRIPT_EVALUATOR_SERVICE_URL
+  value: {{ printf "http://%s:%v" (include "basalt.script-evaluator.fullname" .) .Values.scriptEvaluator.service.ports.http | quote }}
+{{- else }}
 - name: EVALUATOR_SCRIPT_FUNCTION_NAME
   value: {{ .Values.config.lambdaScriptEvaluatorName | quote }}
+{{- end }}
 {{- if and .Values.externalPostgres.existingSecret .Values.externalPostgres.hostKey }}
 - name: DB_HOST
   valueFrom:
@@ -329,16 +365,6 @@ Common environment variables for Basalt services
 - name: DB_NAME
   value: {{ .Values.externalPostgres.database | quote }}
 {{- end }}
-{{- if and .Values.externalPostgres.existingSecret .Values.externalPostgres.sslmodeKey }}
-- name: PGSSLMODE
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.externalPostgres.existingSecret }}
-      key: {{ .Values.externalPostgres.sslmodeKey }}
-{{- else }}
-- name: PGSSLMODE
-  value: {{ .Values.externalPostgres.sslmode | quote }}
-{{- end }}
 - name: API_HOST
   value: {{ .Values.config.apiUrl | quote }}
 - name: DASHBOARD_HOST
@@ -363,6 +389,8 @@ Common environment variables for Basalt services
 - name: ENCRYPTION_KEY
   value: {{ .Values.config.encryptionKey | quote }}
 {{- end }}
+- name: GOOGLE_LOGIN_ENABLED
+  value: {{ .Values.config.auth.google.enabled | quote }}
 {{- if .Values.config.auth.google.enabled }}
 {{- if and .Values.config.auth.google.existingSecret .Values.config.auth.google.clientIdKey }}
 - name: GOOGLE_CLIENT_ID
@@ -385,6 +413,56 @@ Common environment variables for Basalt services
   value: {{ .Values.config.auth.google.clientSecret | quote }}
 {{- end }}
 {{- end }}
+- name: ONELOGIN_ENABLED
+  value: {{ .Values.config.auth.oneLogin.enabled | quote }}
+{{- if .Values.config.auth.oneLogin.enabled }}
+- name: DEFAULT_LOGIN_WORKSPACE_ID
+  value: {{ .Values.config.auth.oneLogin.defaultLoginWorkspaceId | quote }}
+{{- if and .Values.config.auth.oneLogin.existingSecret .Values.config.auth.oneLogin.clientIdKey }}
+- name: ONELOGIN_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.config.auth.oneLogin.existingSecret }}
+      key: {{ .Values.config.auth.oneLogin.clientIdKey }}
+{{- else }}
+- name: ONELOGIN_CLIENT_ID
+  value: {{ .Values.config.auth.oneLogin.clientId | quote }}
+{{- end }}
+{{- if and .Values.config.auth.oneLogin.existingSecret .Values.config.auth.oneLogin.clientSecretKey }}
+- name: ONELOGIN_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.config.auth.oneLogin.existingSecret }}
+      key: {{ .Values.config.auth.oneLogin.clientSecretKey }}
+{{- else }}
+- name: ONELOGIN_CLIENT_SECRET
+  value: {{ .Values.config.auth.oneLogin.clientSecret | quote }}
+{{- end }}
+{{- if and .Values.config.auth.oneLogin.existingSecret .Values.config.auth.oneLogin.issuerKey }}
+- name: ONELOGIN_ISSUER
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.config.auth.oneLogin.existingSecret }}
+      key: {{ .Values.config.auth.oneLogin.issuerKey }}
+{{- else }}
+- name: ONELOGIN_ISSUER
+  value: {{ .Values.config.auth.oneLogin.issuer | quote }}
+{{- end }}
+- name: ONELOGIN_ROLE_ADMIN
+  value: {{ .Values.config.auth.oneLogin.roles.admin | quote }}
+- name: ONELOGIN_ROLE_ENGINEER
+  value: {{ .Values.config.auth.oneLogin.roles.engineer | quote }}
+- name: ONELOGIN_ROLE_BUILDER
+  value: {{ .Values.config.auth.oneLogin.roles.builder | quote }}
+- name: ONELOGIN_ROLE_VIEWER
+  value: {{ .Values.config.auth.oneLogin.roles.viewer | quote }}
+- name: ONELOGIN_DEFAULT_ROLE
+  value: {{ .Values.config.auth.oneLogin.defaultRole | quote }}
+{{- end }}
+- name: PASSWORD_LOGIN_ENABLED
+  value: {{ .Values.config.auth.email.enabled | quote }}
+- name: SIGNUP_ENABLED
+  value: {{ .Values.config.auth.signupEnabled | quote }}
 - name: AWS_BUCKET_NAME
   value: {{ .Values.storage.bucket | quote }}
 - name: AWS_PRIVATE_UPLOAD_BUCKET_NAME
@@ -454,7 +532,7 @@ Compile all warnings into a single message.
 {{- $message := join "\n" $messages -}}
 
 {{- if $message -}}
-{{-   printf "\nVALUES VALIDATION:\n%s" $message -}}
+{{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
 {{- end -}}
 {{- end -}}
 
@@ -484,7 +562,43 @@ basalt: config.sessionSecret
 {{- end -}}
 {{- if and (not .Values.config.encryptionKeyExistingSecret) (not .Values.config.encryptionKey) -}}
 basalt: config.encryptionKey
-    Either config.encryptionKey or config.encryptionKeyExistingSecret with config.encryptionKeySecretKey must be set.
+    Either config.encryptionKey or (config.encryptionKeyExistingSecret and config.encryptionKeySecretKey) must be set.
+{{- end -}}
+{{- if and .Values.config.encryptionKeyExistingSecret (not .Values.config.encryptionKeySecretKey) -}}
+basalt: config.encryptionKeySecretKey
+    config.encryptionKeySecretKey is required when config.encryptionKeyExistingSecret is set.
+{{- end -}}
+{{- if and .Values.config.encryptionKeySecretKey (not .Values.config.encryptionKeyExistingSecret) -}}
+basalt: config.encryptionKeyExistingSecret
+    config.encryptionKeyExistingSecret is required when config.encryptionKeySecretKey is set.
+{{- end -}}
+{{- if not (or .Values.config.auth.google.enabled .Values.config.auth.email.enabled .Values.config.auth.oneLogin.enabled) -}}
+basalt: config.auth
+    At least one authentication method must be enabled (config.auth.google.enabled, config.auth.email.enabled, or config.auth.oneLogin.enabled).
+{{- end -}}
+{{- if .Values.config.auth.google.enabled -}}
+{{- if and (not .Values.config.auth.google.clientId) (not (and .Values.config.auth.google.existingSecret .Values.config.auth.google.clientIdKey)) -}}
+basalt: config.auth.google.clientId
+    Either config.auth.google.clientId or (config.auth.google.existingSecret and config.auth.google.clientIdKey) must be set when Google auth is enabled.
+{{- end -}}
+{{- if and (not .Values.config.auth.google.clientSecret) (not (and .Values.config.auth.google.existingSecret .Values.config.auth.google.clientSecretKey)) -}}
+basalt: config.auth.google.clientSecret
+    Either config.auth.google.clientSecret or (config.auth.google.existingSecret and config.auth.google.clientSecretKey) must be set when Google auth is enabled.
+{{- end -}}
+{{- end -}}
+{{- if .Values.config.auth.oneLogin.enabled -}}
+{{- if and (not .Values.config.auth.oneLogin.clientId) (not (and .Values.config.auth.oneLogin.existingSecret .Values.config.auth.oneLogin.clientIdKey)) -}}
+basalt: config.auth.oneLogin.clientId
+    Either config.auth.oneLogin.clientId or (config.auth.oneLogin.existingSecret and config.auth.oneLogin.clientIdKey) must be set when OneLogin auth is enabled.
+{{- end -}}
+{{- if and (not .Values.config.auth.oneLogin.clientSecret) (not (and .Values.config.auth.oneLogin.existingSecret .Values.config.auth.oneLogin.clientSecretKey)) -}}
+basalt: config.auth.oneLogin.clientSecret
+    Either config.auth.oneLogin.clientSecret or (config.auth.oneLogin.existingSecret and config.auth.oneLogin.clientSecretKey) must be set when OneLogin auth is enabled.
+{{- end -}}
+{{- if and (not .Values.config.auth.oneLogin.issuer) (not (and .Values.config.auth.oneLogin.existingSecret .Values.config.auth.oneLogin.issuerKey)) -}}
+basalt: config.auth.oneLogin.issuer
+    Either config.auth.oneLogin.issuer or (config.auth.oneLogin.existingSecret and config.auth.oneLogin.issuerKey) must be set when OneLogin auth is enabled.
+{{- end -}}
 {{- end -}}
 {{- end -}}
 

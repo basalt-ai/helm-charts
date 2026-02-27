@@ -91,6 +91,14 @@ spec:
             - name: API_URL
               value: {{ .Values.config.apiUrl | quote }}
             {{- end }}
+            - name: PASSWORD_LOGIN_ENABLED
+              value: {{ .Values.config.auth.email.enabled | quote }}
+            - name: GOOGLE_LOGIN_ENABLED
+              value: {{ .Values.config.auth.google.enabled | quote }}
+            - name: ONELOGIN_ENABLED
+              value: {{ .Values.config.auth.oneLogin.enabled | quote }}
+            - name: SIGNUP_ENABLED
+              value: {{ .Values.config.auth.signupEnabled | quote }}
             {{- if .Values.webApp.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.webApp.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}

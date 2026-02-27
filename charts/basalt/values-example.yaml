@@ -75,17 +75,24 @@ migration:
     requests:
       memory: 256Mi
 
+scriptEvaluator:
+  enabled: true
+
 config:
   apiUrl: https://backend-api.acme.com
   dashboardUrl: https://app.acme.com
   region: eu-west-3
   sessionSecret: supersecret
-  lambdaScriptEvaluatorName: ScriptEvaluatorEks
 
   encryptionKeyExistingSecret: provider-keys
   encryptionKeySecretKey: encryption_key
 
   auth:
+    signupEnabled: true
+    email:
+      enabled: false
+    oneLogin:
+      enabled: false
     google:
       enabled: true
       existingSecret: google-oauth

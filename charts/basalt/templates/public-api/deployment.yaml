@@ -106,6 +106,10 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.publicApi.containerPorts.http }}
+            {{- if .Values.publicApi.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.publicApi.containerPorts.metrics }}
+            {{- end }}
             {{- if .Values.publicApi.extraContainerPorts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.publicApi.extraContainerPorts "context" $) | nindent 12 }}
             {{- end }}

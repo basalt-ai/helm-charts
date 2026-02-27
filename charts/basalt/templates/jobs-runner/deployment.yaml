@@ -101,6 +101,11 @@ spec:
           {{- if .Values.jobsRunner.resources }}
           resources: {{- toYaml .Values.jobsRunner.resources | nindent 12 }}
           {{- end }}
+          {{- if .Values.jobsRunner.metrics.enabled }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.jobsRunner.containerPorts.metrics }}
+          {{- end }}
           {{- if not .Values.diagnosticMode.enabled }}
           {{- if .Values.jobsRunner.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.jobsRunner.customLivenessProbe "context" $) | nindent 12 }}

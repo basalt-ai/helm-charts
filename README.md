@@ -21,4 +21,4 @@ An example Terraform file is available [here](main.tf), it should cover what nee
 ## Known issues / limitations:
 
 - The `arm64` image is not available, but can be added if needed.
-- AWS is required to run the application (SQS, S3, S3 Notifications, Lambda)
+- AWS is required to run the application (SQS, S3, S3 Notifications)

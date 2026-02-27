@@ -1,0 +1,36 @@
+{{- if .Values.jobsRunner.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "basalt.jobs-runner.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: jobs-runner
+  {{- if or .Values.jobsRunner.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.jobsRunner.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.jobsRunner.service.type }}
+  {{- if and .Values.jobsRunner.service.clusterIP (eq .Values.jobsRunner.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.jobsRunner.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: metrics
+      port: {{ .Values.jobsRunner.service.ports.metrics }}
+      {{- if not (eq .Values.jobsRunner.service.ports.metrics .Values.jobsRunner.containerPorts.metrics) }}
+      targetPort: {{ .Values.jobsRunner.containerPorts.metrics }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.jobsRunner.service.type "NodePort") (eq .Values.jobsRunner.service.type "LoadBalancer")) (not (empty .Values.jobsRunner.service.nodePorts.metrics)) }}
+      nodePort: {{ .Values.jobsRunner.service.nodePorts.metrics }}
+      {{- else if eq .Values.jobsRunner.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.jobsRunner.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.jobsRunner.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.jobsRunner.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: jobs-runner
+{{- end }}

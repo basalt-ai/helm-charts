@@ -1,0 +1,2 @@
+{{- include "basalt.validateValues" . -}}
+Basalt has been deployed successfully.
