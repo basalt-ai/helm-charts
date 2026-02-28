@@ -521,7 +521,7 @@ Common environment variables for Basalt services
 - name: CLICKHOUSE_DB_NAME
   value: {{ .Values.externalClickhouse.database | quote }}
 {{- end }}
-{{- include "basalt.redisEnvVars" . }}
+{{ include "basalt.redisEnvVars" . }}
 {{- if and .Values.externalRedis.existingSecret .Values.externalRedis.schemeKey .Values.externalRedis.hostKey .Values.externalRedis.portKey }}
 {{/* REDIS_URL cannot be composed when using secrets */}}
 {{- else }}
