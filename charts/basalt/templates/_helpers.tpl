@@ -240,8 +240,6 @@ Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
 Redis environment variables (scheme, host, port, username, password)
 */}}
 {{- define "basalt.redisEnvVars" -}}
-- name: NODE_ENV
-  value: production
 {{- if and .Values.externalRedis.existingSecret .Values.externalRedis.schemeKey }}
 - name: REDIS_SCHEME
   valueFrom:
@@ -298,6 +296,8 @@ Redis environment variables (scheme, host, port, username, password)
 Common environment variables for Basalt services
 */}}
 {{- define "basalt.commonEnvVars" -}}
+- name: NODE_ENV
+  value: production
 - name: AWS_REGION
   value: {{ .Values.config.region | quote }}
 {{- if .Values.scriptEvaluator.enabled }}
@@ -521,7 +521,7 @@ Common environment variables for Basalt services
 - name: CLICKHOUSE_DB_NAME
   value: {{ .Values.externalClickhouse.database | quote }}
 {{- end }}
-{{ include "basalt.redisEnvVars" . }}
+{{- include "basalt.redisEnvVars" . }}
 {{- if and .Values.externalRedis.existingSecret .Values.externalRedis.schemeKey .Values.externalRedis.hostKey .Values.externalRedis.portKey }}
 {{/* REDIS_URL cannot be composed when using secrets */}}
 {{- else }}
