@@ -28,6 +28,8 @@ The callback URL to configure in OneLogin is:
 https://{api_url}/auth/onelogin/callback
 ```
 
+The Authentication Method must be set to `POST`.
+
 
 ## Known issues / limitations:
 
