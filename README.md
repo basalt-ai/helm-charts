@@ -18,6 +18,17 @@ An example `values.yaml` is available [here](charts/basalt/values-example.yaml),
 
 An example Terraform file is available [here](main.tf), it should cover what needs to be created to run the application on AWS.
 
+## SSO
+
+### OneLogin
+
+The callback URL to configure in OneLogin is:
+
+```
+https://{api_url}/auth/onelogin/callback
+```
+
+
 ## Known issues / limitations:
 
 - The `arm64` image is not available, but can be added if needed.

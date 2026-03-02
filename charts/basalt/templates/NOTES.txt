@@ -1,2 +1,9 @@
 {{- include "basalt.validateValues" . -}}
 Basalt has been deployed successfully.
+{{- if and .Values.config.auth.oneLogin.enabled .Values.api.ingress.enabled }}
+
+NOTE: OneLogin SSO is enabled. Make sure to configure the callback URL in OneLogin:
+
+    https://{{ .Values.api.ingress.hostname }}/auth/onelogin/callback
+
+{{- end }}
