@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   basalt:
   - apiVersion: v2
+    appVersion: v3.11.16
+    created: "2026-03-06T12:22:13.033688965Z"
+    description: Basalt
+    digest: ba3889932f2be2aac4b5875379e00b29916f14161ff60c4c262fbfb2d834d22c
+    home: https://getbasalt.ai
+    name: basalt
+    urls:
+    - https://github.com/basalt-ai/helm-charts/releases/download/helm-chart-1.1.4/basalt-1.1.4.tgz
+    version: 1.1.4
+  - apiVersion: v2
     appVersion: v3.11.12
     created: "2026-02-28T12:33:20.320708207Z"
     description: Basalt
@@ -91,4 +101,4 @@ entries:
     urls:
     - https://github.com/basalt-ai/helm-charts/releases/download/helm-chart-1.0.3/basalt-1.0.3.tgz
     version: 1.0.3
-generated: "2026-02-28T12:33:20.320741599Z"
+generated: "2026-03-06T12:22:13.033731164Z"
